@@ -8,21 +8,20 @@ using namespace std;
 using IATA = array<char const, 3>;
 
 struct Freight {
-	enum class Type {
-		Container,
-		Pallet,
+	enum class Type: char {
+		Container = 0b010,
+		Pallet = 0b100,
 	};
 	// AYF12345IB, for example
-	using id = array<char const, 10>;
 
 	Type uld;
-	id uldid;
+	string uldid;
 	// we're still waiting for C++20 constexpr strings -_-
-	string_view aircraft;
+	string aircraft;
 	int weight;
 	IATA destination;
-	explicit constexpr Freight(
-		Type type, id id, string_view aircraft, int weight, IATA dest
+	explicit Freight(
+		Type type, string id, string aircraft, int weight, IATA dest
 	) noexcept:
 		uld(type),
 		uldid(id),
@@ -43,8 +42,9 @@ int main() noexcept {
 	// input |> output |> ignore
 }
 
-template <class T>
-auto prompt(char const *question, function<T(string)> const &&p) -> T {
+template <class T, class fn_t>
+auto prompt(char const *question, fn_t const &&fn) -> T {
+	function<T(string)> actual_fn{fn};
 	while (true) {
 		cout << question << "\n> ";
 		cin.clear();
@@ -52,12 +52,40 @@ auto prompt(char const *question, function<T(string)> const &&p) -> T {
 		string line;
 		getline(cin, line);
 		try {
-			return p(line);
+			return actual_fn(line);
 		} catch (...) {
-			cout << "Invalid input! Try again.\n";
+			cerr << "Invalid input! Try again.\n";
 			continue;
 		}
 	}
+}
+
+char id_type(string s) {
+	if (s.length() != 10) {
+		throw 0;
+	}
+
+	auto first3{s.substr(0, 3)};
+
+	if (false
+		|| s == "AYF"
+		|| s == "AYK"
+		|| s == "AAA"
+		|| s == "AYY"
+	) {
+		// it's MY gun and I'm pointing it at MY foot
+		return static_cast<char>(Freight::Type::Container);
+	}
+
+	if (false
+		|| s == "PAG"
+		|| s == "PMC"
+		|| s == "PLA"
+	) {
+		return static_cast<char>(Freight::Type::Pallet);
+	}
+
+	return 0;
 }
 
 Freight *input() noexcept {
@@ -68,7 +96,7 @@ Freight *input() noexcept {
 		prompt<Freight::Type>(
 			"What type of freight is it?\n"
 			"Enter either 'container' or 'pallet'",
-			{[](string s) {
+			[](string s) {
 				if (s == "container") {
 					return Freight::Type::Container;
 				}
@@ -76,7 +104,56 @@ Freight *input() noexcept {
 					return Freight::Type::Pallet;
 				}
 				throw 0;
-			}}
+			}
 		)
 	};
+
+	auto id{
+		prompt<string>(
+			"Enter an appropriate 10 character id.",
+			[type](string s){
+				if (static_cast<char>(type) != id_type(s)) {
+					cerr << "Inappropriate id " << s << " for type.\n";
+					throw 0;
+				}
+				return move(s);
+			}
+		)
+	};
+
+	auto aircraft{
+		prompt<string>(
+			"Enter the aircraft that will be carrying the freight.\n",
+			[](string s) { return move(s); }
+		)
+	};
+
+	auto weight{
+		prompt<int>(
+			"Enter the weight of the freight.",
+			[](string s) {
+				auto w{stoi(s)};
+				if (w < 0) {
+					cerr << "Weight must be greater than zero!\n";
+					throw 0;
+				}
+				return w;
+			}
+		)
+	};
+
+	auto dest{
+		prompt<IATA>(
+			"Enter the destination of the freight.",
+			[](string s) {
+				if (s.length() != 3) {
+					cerr << "The destination must be an IATA!\n";
+					throw 0;
+				}
+				return array{s[0], s[1], s[2]};
+			}
+		)
+	};
+
+	return new Freight(type, id, aircraft, weight, dest);
 }
