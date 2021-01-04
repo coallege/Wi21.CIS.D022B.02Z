@@ -1,5 +1,4 @@
 #include <array>
-#include <cstddef>
 #include <exception>
 #include <string>
 #include <iostream>
@@ -12,11 +11,9 @@ struct Freight {
 		Container,
 		Pallet,
 	};
-	// AYF12345IB, for example
 
 	Type uld;
 	string uldid;
-	// we're still waiting for C++20 constexpr strings -_-
 	string aircraft;
 	int weight;
 	string destination;
@@ -89,9 +86,6 @@ inline auto prompt(char const *question, fn_t const &&fn) noexcept -> T {
 }
 
 inline Freight *input() noexcept {
-	// when you
-	// when you can't use fast_io to take input from the user
-
 	auto type{
 		prompt<Freight::Type>(
 			"What type of freight is it?\n"
@@ -112,7 +106,7 @@ inline Freight *input() noexcept {
 		prompt<string>(
 			"Enter an appropriate 10 character id.",
 			[type](string s){
-				if (static_cast<int>(type) != id_type(s)) {
+				if (type != id_type(s)) {
 					cerr
 						<< "Inappropriate id " << s << " for type "
 						<< to_string(type) << "!\n\n";
@@ -155,7 +149,7 @@ inline Freight *input() noexcept {
 		)
 	};
 
-	return new Freight(type, id, aircraft, weight, dest);
+	return new Freight(type, move(id), move(aircraft), weight, move(dest));
 }
 
 inline void output(Freight *freight) noexcept {
