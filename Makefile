@@ -9,8 +9,7 @@ default:
 	clang++ $(flags) $< -o $@
 
 run~%: %.exe
-	@echo --- BEG $< ---
+	@cls
 	@$<
-	@echo --- END $< ---
 
 .SECONDARY:
