@@ -43,7 +43,7 @@ inline mut_str getline() noexcept {
 }
 
 // Better pray that the compiler inlines this puppy
-inline char rot13_c(char c) noexcept {
+constexpr char rot13_c(char c) noexcept {
 	// not A-z
 	if (c < 'A' || c > 'z') {
 		return c;
@@ -180,3 +180,28 @@ int main(int, char const *argv[]) noexcept {
 		return 0;
 	}
 }
+
+/* TESTS */
+constexpr bool rot13_eq(str a, str b) noexcept {
+	size_t len = strlen(a);
+	size_t blen = strlen(b);
+
+	if (blen != len) {
+		return false;
+	}
+
+	while (len --> 0) {
+		if (rot13_c(a[len]) != b[len]) {
+			return false;
+		}
+	}
+
+	return true;
+}
+
+static_assert(rot13_eq("ALPHABET", "NYCUNORG"));
+static_assert(rot13_eq("NYCUNORG", "ALPHABET"));
+static_assert(rot13_eq("TAF VF", "GNS IS"));
+static_assert(rot13_eq("paddrpf", "cnqqecs"));
+static_assert(rot13_eq("zvpebor", "microbe"));
+static_assert(rot13_eq(" ,.?!", " ,.?!"), "Ignores space and punct");
