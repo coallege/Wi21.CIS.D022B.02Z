@@ -22,15 +22,15 @@ inline void print(str str) noexcept;
 inline mut_str getline() noexcept;
 
 /// Core rot13 algo
-constexpr char rot13_c(char c) noexcept;
+constexpr char rot13c(char c) noexcept;
 /// Does rot13 in place
 constexpr void rot13(mut_str str) noexcept;
 inline void rot13interactive() noexcept;
 /// Never run at runtime, for testing only
 /// Tests if the rot13 of str a is str b
-constexpr bool rot13_eq(str a, str b) noexcept;
+constexpr bool rot13eq(str a, str b) noexcept;
 
-int main(int, char const *argv[]) noexcept {
+int main(int, str argv[]) noexcept {
 	// menu
 	printf(
 		"Cole Gannon's %s\n"
@@ -54,8 +54,6 @@ int main(int, char const *argv[]) noexcept {
 			return 0;
 		}
 
-		// I am never going to remember to free this on all paths
-		// so I am going to use RAII to do it for me.
 		size_t len = strlen(choice);
 		// let's slice off the newline at the end
 		size_t last_index = len - 1;
@@ -102,8 +100,7 @@ int main(int, char const *argv[]) noexcept {
 	}
 }
 
-// Better pray that the compiler inlines this puppy
-constexpr char rot13_c(char c) noexcept {
+constexpr char rot13c(char c) noexcept {
 	// not A-z
 	if (c < 'A' || c > 'z') {
 		return c;
@@ -124,7 +121,7 @@ constexpr char rot13_c(char c) noexcept {
 
 constexpr void rot13(mut_str str) noexcept {
 	while (*str != '\0') {
-		*str = rot13_c(*str);
+		*str = rot13c(*str);
 		str++;
 	}
 }
@@ -154,16 +151,15 @@ inline void print(str str) noexcept {
 	fflush(stdout);
 }
 
-constexpr bool rot13_eq(str a, str b) noexcept {
+constexpr bool rot13eq(str a, str b) noexcept {
 	size_t len = strlen(a);
-	size_t blen = strlen(b);
 
-	if (blen != len) {
+	if (len != strlen(b)) {
 		return false;
 	}
 
 	while (len --> 0) {
-		if (rot13_c(a[len]) != b[len]) {
+		if (rot13c(a[len]) != b[len]) {
 			return false;
 		}
 	}
@@ -197,9 +193,9 @@ constexpr size_t strlen(str str) noexcept {
 	return i;
 }
 
-static_assert(rot13_eq("ALPHABET", "NYCUNORG"));
-static_assert(rot13_eq("NYCUNORG", "ALPHABET"));
-static_assert(rot13_eq("TAF VF"  , "GNS IS"  ));
-static_assert(rot13_eq("paddrpf" , "cnqqecs" ));
-static_assert(rot13_eq("zvpebor" , "microbe" ));
-static_assert(rot13_eq(" ,.?!"   , " ,.?!"   ));
+static_assert(rot13eq("ALPHABET", "NYCUNORG"));
+static_assert(rot13eq("NYCUNORG", "ALPHABET"));
+static_assert(rot13eq("TAF VF"  , "GNS IS"  ));
+static_assert(rot13eq("paddrpf" , "cnqqecs" ));
+static_assert(rot13eq("zvpebor" , "microbe" ));
+static_assert(rot13eq(" ,.?!"   , " ,.?!"   ));
