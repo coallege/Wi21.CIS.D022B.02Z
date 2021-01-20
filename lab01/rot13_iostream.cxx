@@ -41,7 +41,7 @@ void input(string *input) {
 }
 
 void rot13(string *strptr) {
-	string &input = reinterpret_cast<string &>(*strptr);
+	string &input = *strptr;
 	int inputSize = input.size();
 	int index = 0;
 	while(index != inputSize) {

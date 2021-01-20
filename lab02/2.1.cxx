@@ -120,7 +120,7 @@ inline Freight *input() noexcept {
 	auto aircraft{
 		prompt<string>(
 			"Enter the aircraft that will be carrying the freight.",
-			[](string s) { return move(s); }
+			[](string s) { return s; }
 		)
 	};
 
@@ -144,7 +144,7 @@ inline Freight *input() noexcept {
 				if (s.length() != 3) {
 					throw exception("The destination must be three characters");
 				}
-				return move(s);
+				return s;
 			}
 		)
 	};
