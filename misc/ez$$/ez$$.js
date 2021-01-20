@@ -36,7 +36,6 @@ void async function ez$$() {
 		console.group(qs);
 		const ele = document.querySelector(qs);
 		try {
-			debugger;
 			if (!ele) {
 				console.warn("BAD ELEMENT");
 				continue participation;
@@ -51,6 +50,7 @@ void async function ez$$() {
 			}
 			console.info("OK SHORT ANSWER PAYLOAD");
 
+			/** @type {HTMLDivElement[]} */
 			const questions =
 				[...shortAnswerPayload.children]
 					.map(qsa => qsa.firstChild);
@@ -59,30 +59,73 @@ void async function ez$$() {
 			console.groupCollapsed("QUESTIONS");
 			questions:
 			for (let i = 0; i < len; ++i) {
-				const question = questions[i];
-				const title = question.children[0]?.children?.[1];
-				if (!title) {
-					console.warn(`BAD TITLE ${i}`);
+				const container = questions[i].children?.[0];
+				if (!container) {
+					console.warn(`BAD CONTAINER ${i}`);
 					continue questions;
 				}
-				console.info(`OK TITLE ${i}`);
+				console.info(`OK CONTAINER ${i}`);
 
 				const questionData = part.payload.questions[i];
+				const answerBox    = document.createElement("span");
+				answerBox.style.fontWeight = "bold";
+				answerBox.style.fontFamily = "Consolas, monospace";
+
 				if (questionData.answers) {
 					console.info(`OK SHORT ANSWER ${i}`);
-					title.innerHTML += ` <i>(${questionData.answers.join(", ")})</i>`;
+					answerBox.innerText += questionData
+						.answers
+						.join(", ");
 				} else if (questionData.choices) {
 					console.info(`OK MULTI CHOICE ${i}`);
-					title.innerHTML += ` <i>(#${
-						questionData.choices.findIndex(({ correct }) => correct) + 1
-					})</i>`;
+					const humanIndex = questionData
+						.choices
+						.findIndex(({ correct }) => correct)
+						+ 1
+						;
+
+					answerBox.innerText += `#${humanIndex}`;
 				} else {
 					console.warn(`BAD QUESTION ${i}`);
 				}
+
+				container.appendChild(answerBox);
 			}
 			console.groupEnd();
 		} finally {
 			console.groupEnd();
 		}
+	}
+}();
+void function ez$$_anim() {
+	const eight_speeds = [
+		...document.querySelectorAll("input[aria-label='2x speed']")
+	];
+
+	for (const checkbox of eight_speeds) {
+		if (checkbox.value === "false") {
+			checkbox.click();
+		}
+	}
+
+	const start_buttons = [
+		...document.querySelectorAll("button.start-button.start-graphic")
+	];
+
+	for (const start_button of start_buttons) {
+		start_button.click();
+	}
+
+	for (let i = 0; i < 30; ++i) {
+		setTimeout(() => {
+			/** @type {HTMLButtonElement[]} */
+			const play_buttons = [
+				...document.querySelectorAll("div.play-button.bounce")
+			];
+
+			for (const play_button of play_buttons) {
+				play_button.click();
+			}
+		}, 2000 * i);
 	}
 }();
