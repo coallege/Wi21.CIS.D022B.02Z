@@ -25,4 +25,4 @@ run-release~%: %.release.exe
 
 .SECONDARY:
 
-.PHONY: root-default run-release
+.PHONY: root-default run run-release

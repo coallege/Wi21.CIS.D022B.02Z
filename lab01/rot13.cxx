@@ -55,11 +55,9 @@ int main(int, str argv[]) noexcept {
 		}
 
 		size_t len = strlen(choice);
-		// let's slice off the newline at the end
-		size_t last_index = len - 1;
-		choice[last_index] = '\0';
-		// and since we have, let's adjust len
-		len--;
+
+		// replace newline at the end with '\0' and adjust the length to match
+		choice[--len] = '\0';
 
 		if (len == 0) {
 			return 0;

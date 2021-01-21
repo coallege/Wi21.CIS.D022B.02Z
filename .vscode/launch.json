@@ -1,13 +1,21 @@
 {
-   "version": "0.2.0",
-   "configurations": [
-      {
-         "type": "lldb",
-         "request": "launch",
-         "name": "debug lab01 rot13.cxx",
-         "program": "${workspaceFolder}/lab01/rot13.debug.exe",
-         "args": [],
-         "cwd": "${workspaceFolder}"
-      }
-   ]
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"type": "lldb",
+			"request": "launch",
+			"name": "debug lab01 rot13.cxx",
+			"program": "${workspaceFolder}/lab01/rot13.debug.exe",
+			"args": [],
+			"cwd": "${workspaceFolder}"
+		},
+		{
+			"type": "lldb",
+			"request": "launch",
+			"name": "debug lab02 rot13.cxx",
+			"program": "${workspaceFolder}/lab01/rot13.debug.exe",
+			"args": [],
+			"cwd": "${workspaceFolder}"
+		}
+	]
 }

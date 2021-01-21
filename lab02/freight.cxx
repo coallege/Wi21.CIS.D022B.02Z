@@ -54,7 +54,6 @@ inline Freight::Type id_type(string s) {
 		|| first3 == "AAA"
 		|| first3 == "AYY"
 	) {
-		// it's MY gun and I'm pointing it at MY foot
 		return Freight::Type::Container;
 	}
 
@@ -112,7 +111,7 @@ inline Freight *input() noexcept {
 						<< to_string(type) << "!\n\n";
 					throw 0;
 				}
-				return move(s);
+				return s;
 			}
 		)
 	};
