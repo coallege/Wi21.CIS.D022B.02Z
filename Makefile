@@ -1,15 +1,28 @@
+cxx   := clang++
 proot := $(dir $(lastword $(MAKEFILE_LIST)))
-flags := $(shell misc/kinda_cat.exe compile_flags.txt)
 
-default:
-	@echo $(flags)
+space_cat = $(shell $(proot)/misc/space_cat.exe $(proot)/$(1))
+
+cxx_flags      = $(call space_cat,compile_flags.txt)
+release_flags ?= $(call space_cat,release_flags.txt)
+
+root-default:
 	@echo you$$ make run~program.exe
 
-%.exe: %.cxx
-	clang++ $(flags) $< -o $@
+%.debug.exe: %.cxx
+	$(cxx) $(cxx_flags) -g $< -o $@
 
-run~%: %.exe
+run~%: %.debug.exe
+	@cls
+	@$<
+
+%.release.exe: %.cxx
+	$(cxx) $(cxx_flags) $(release_flags) $< -o $@
+
+run-release~%: %.release.exe
 	@cls
 	@$<
 
 .SECONDARY:
+
+.PHONY: root-default run-release
