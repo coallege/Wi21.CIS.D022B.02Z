@@ -12,8 +12,8 @@
 		{
 			"type": "lldb",
 			"request": "launch",
-			"name": "debug lab02 rot13.cxx",
-			"program": "${workspaceFolder}/lab01/rot13.debug.exe",
+			"name": "debug lab02 iba_2.1.cxx",
+			"program": "${workspaceFolder}/lab02/iba_2.1.debug.exe",
 			"args": [],
 			"cwd": "${workspaceFolder}"
 		}
