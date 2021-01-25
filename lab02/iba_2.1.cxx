@@ -6,7 +6,8 @@
 
 using namespace std;
 
-using IANA = array<char, 3>;
+// we're gonna borrow a character for the null byte
+using IANA = array<char, 4>;
 
 struct Freight {
 	enum class Type: uint8_t {
@@ -14,12 +15,12 @@ struct Freight {
 		Pallet,
 	};
 
+	/// weight can't be negative so let's make it impossible to represent
 	using weight_t = uint32_t;
 
 	Freight::Type uld;
 	string uldid;
 	string aircraft;
-	/// freight can't be less than 0 anyways
 	weight_t weight;
 	IANA destination;
 	explicit Freight(
@@ -33,10 +34,18 @@ inline Freight *input() noexcept;
 inline void output(Freight const *) noexcept;
 int main() {
 	auto user_freight{input()};
+	if (user_freight == nullptr) {
+		cout << "Interrupt...\n";
+		return 1;
+	}
 	output(user_freight);
 }
 
-inline Freight::Type id_type(string const s) noexcept;
+/// Returns true on success
+inline bool sgetline(string &output) noexcept {
+	getline(cin, output);
+	return cin.good();
+}
 
 inline Freight *input() noexcept {
 	Freight::Type freight_type;
@@ -44,10 +53,7 @@ inline Freight *input() noexcept {
 	while (true) {
 		cout << "Enter eight 'container' or 'pallet'\n> ";
 		string input;
-		getline(cin, input);
-		if (cin.bad()) {
-			return nullptr;
-		}
+		if (!sgetline(input)) return nullptr;
 
 		if (input == "container") {
 			freight_type = {Freight::Type::Container};
@@ -64,10 +70,7 @@ inline Freight *input() noexcept {
 	cout << "Enter an appropriate id:\n";
 	while (true) {
 		cout << "> ";
-		getline(cin, id);
-		if (cin.bad()) {
-			return nullptr;
-		}
+		if (!sgetline(id)) return nullptr;
 
 		auto first3{id.substr(0, 3)};
 
@@ -108,10 +111,7 @@ inline Freight *input() noexcept {
 	while (true) {
 		cout << "> ";
 		string input;
-		getline(cin, input);
-		if (cin.bad()) {
-			return nullptr;
-		}
+		if (!sgetline(input)) return nullptr;
 
 		auto const size{input.size()};
 		auto const start{input.c_str()};
@@ -136,9 +136,9 @@ inline Freight *input() noexcept {
 	while (true) {
 		cout << "> ";
 		string input;
-		getline(cin, input);
+		if (!sgetline(input)) return nullptr;
 		if (input.length() == 3) {
-			dest = {input[0], input[1], input[2]};
+			dest = {input[0], input[1], input[2], '\0'};
 			break;
 		}
 
@@ -154,6 +154,16 @@ inline Freight *input() noexcept {
 	);
 };
 
-inline void output(Freight const *) noexcept {
-	
+
+constexpr char const *type_to_string(Freight::Type t) noexcept {
+	return t == Freight::Type::Container ? "Container" : "Pallet";
+}
+
+inline void output(Freight const *freight) noexcept {
+	cout << ""
+	"uld         = " << type_to_string(freight->uld) << "\n"
+	"uldid       = " << freight->uldid << "\n"
+	"aircraft    = " << freight->aircraft << "\n"
+	"weight      = " << freight->weight << "\n"
+	"destination = " << freight->destination.data() << "\n";
 }
