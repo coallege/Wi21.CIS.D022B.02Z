@@ -1,5 +1,6 @@
 #include <cstdint>
 #include <cstdlib>
+#include <stdint.h>
 #include <string>
 #include <array>
 #include <iostream>
@@ -9,27 +10,104 @@ using namespace std;
 // we're gonna borrow a character for the null byte
 using IANA = array<char, 4>;
 
-struct Freight {
+class Freight {
+public:
 	enum class Type: uint8_t {
-		Container,
-		Pallet,
+		Container = 0,
+		Pallet    = 1,
 	};
 
-	/// weight can't be negative so let's make it impossible to represent
-	using weight_t = uint32_t;
+	// You can't extend enums in C++
+	enum class MaybeType: uint8_t {
+		Container = 0,
+		Pallet    = 1,
+		None      = 2
+	};
 
-	Freight::Type uld;
+	using weight_t = uint32_t;
+private:
+	Type uld;
 	string uldid;
 	string aircraft;
 	weight_t weight;
 	IANA destination;
+
+	// Would be nice if you could declare methods on enums like you can in Rust
+	static inline Type type_from_str(string s);
+	static inline string str_from_type(Type t) noexcept;
+
+	static inline bool is_container_alignment(string str3) noexcept;
+	static inline bool is_pallet_alignment(string str3) noexcept;
+	inline Type *id_alignment() noexcept;
+public:
+	explicit Freight() noexcept = delete;
 	explicit Freight(
-		Freight::Type type, string id, string aircraft, weight_t weight, IANA dest
+		Type type, string id, string aircraft, weight_t weight, IANA dest
 	) noexcept:
 		uld{type}, uldid{id}, aircraft{aircraft}, weight{weight}, destination{dest}
 	{};
+
+	// Methods are marked inline by default but no harm in explicitly saying it
+	inline Type getULD()  const noexcept { return uld; }
+	inline string getULDID()     const noexcept { return uldid; }
+	inline string getAircraft()  const noexcept { return aircraft; }
+	inline weight_t getWeight()  const noexcept { return weight; }
+	inline IANA getDestination() const noexcept { return destination; }
+
+	// Setters can be declared out of line since they are more complex
+	inline void setULD(Type uld);
+	inline void setULD(string uld);
+	inline void setULDID(string uldid);
+	inline void setAircraft(string aircraft);
+	inline void setWeight(weight_t weight);
+	inline void setWeight(string weight);
+	inline void setDestination(IANA destination);
+	inline void setDestination(string destination);
 };
 
+inline Freight::Type Freight::type_from_str(string s) {
+	if (s == "container") {
+		return Freight::Type::Container;
+	}
+
+	if (s == "pallet") {
+		return Freight::Type::Pallet;
+	}
+
+	throw exception("The input string must be either 'container' or 'pallet'");
+};
+
+inline string Freight::str_from_type(Freight::Type t) noexcept {
+	return t == Freight::Type::Container ? "Container" : "Pallet";
+}
+
+inline bool Freight::is_container_alignment(string str3) noexcept {
+	return 0
+		|| str3 == "AYF"
+		|| str3 == "AYK"
+		|| str3 == "AAA"
+		|| str3 == "AYY";
+}
+
+inline bool Freight::is_pallet_alignment(string str3) noexcept {
+	return 0
+		|| str3 == "PAG"
+		|| str3 == "PMC"
+		|| str3 == "PLA";
+}
+
+inline Freight::Type *Freight::id_alignment() noexcept {
+	if (uldid.empty()) {
+		return nullptr;
+	}
+}
+
+
+inline void Freight::setULD(Type uld) {
+	
+}
+
+inline void Freight::setULD()
 inline Freight *input() noexcept;
 inline void output(Freight const *) noexcept;
 int main() {
@@ -48,7 +126,8 @@ inline bool sgetline(string &output) noexcept {
 }
 
 inline Freight *input() noexcept {
-	Freight::Type freight_type;
+	using FreightType = Freight::FreightType;
+	FreightType freight_type;
 	cout << "What type of freight is it?\n";
 	while (true) {
 		cout << "Enter eight 'container' or 'pallet'\n> ";
@@ -56,12 +135,12 @@ inline Freight *input() noexcept {
 		if (!sgetline(input)) return nullptr;
 
 		if (input == "container") {
-			freight_type = {Freight::Type::Container};
+			freight_type = {FreightType::Container};
 			break;
 		}
 
 		if (input == "pallet") {
-			freight_type = {Freight::Type::Pallet};
+			freight_type = {FreightType::Pallet};
 			break;
 		}
 	}
@@ -80,7 +159,7 @@ inline Freight *input() noexcept {
 			|| first3 == "AAA"
 			|| first3 == "AYY"
 		) {
-			if (freight_type == Freight::Type::Container) {
+			if (freight_type == FreightType::Container) {
 				break;
 			}
 			cout << first3 << " is not an appropriate prefix for Containers!\n";
@@ -92,7 +171,7 @@ inline Freight *input() noexcept {
 			|| first3 == "PMC"
 			|| first3 == "PLA"
 		) {
-			if (freight_type == Freight::Type::Pallet) {
+			if (freight_type == FreightType::Pallet) {
 				break;
 			}
 			cout << first3 << " is not an appropriate prefix for Pallets!\n";
