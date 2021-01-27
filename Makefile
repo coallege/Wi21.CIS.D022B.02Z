@@ -13,14 +13,12 @@ root-default:
 	$(cxx) $(cxx_flags) -g $< -o $@
 
 run~%: %.debug.exe
-	@cls
 	@$<
 
 %.release.exe: %.cxx
 	$(cxx) $(cxx_flags) $(release_flags) $< -o $@
 
 run-release~%: %.release.exe
-	@cls
 	@$<
 
 .SECONDARY:

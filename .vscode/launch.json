@@ -12,8 +12,16 @@
 		{
 			"type": "lldb",
 			"request": "launch",
-			"name": "debug lab02 iba_2.1.cxx",
+			"name": "debug lab02.1 iba_2.1.cxx",
 			"program": "${workspaceFolder}/lab02/iba_2.1.debug.exe",
+			"args": [],
+			"cwd": "${workspaceFolder}"
+		},
+		{
+			"type": "lldb",
+			"request": "launch",
+			"name": "debug lab02.2 iba_2.2.cxx",
+			"program": "${workspaceFolder}/lab02/iba_2.2.debug.exe",
 			"args": [],
 			"cwd": "${workspaceFolder}"
 		}

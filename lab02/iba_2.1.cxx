@@ -39,10 +39,11 @@ int main() {
 		return 1;
 	}
 	output(user_freight);
+	delete user_freight;
 }
 
 /// Returns true on success
-inline bool sgetline(string &output) noexcept {
+inline bool nextline(string &output) noexcept {
 	getline(cin, output);
 	return cin.good();
 }
@@ -53,7 +54,7 @@ inline Freight *input() noexcept {
 	while (true) {
 		cout << "Enter eight 'container' or 'pallet'\n> ";
 		string input;
-		if (!sgetline(input)) return nullptr;
+		if (!nextline(input)) return nullptr;
 
 		if (input == "container") {
 			freight_type = {Freight::Type::Container};
@@ -70,7 +71,7 @@ inline Freight *input() noexcept {
 	cout << "Enter an appropriate id:\n";
 	while (true) {
 		cout << "> ";
-		if (!sgetline(id)) return nullptr;
+		if (!nextline(id)) return nullptr;
 
 		auto first3{id.substr(0, 3)};
 
@@ -111,7 +112,7 @@ inline Freight *input() noexcept {
 	while (true) {
 		cout << "> ";
 		string input;
-		if (!sgetline(input)) return nullptr;
+		if (!nextline(input)) return nullptr;
 
 		auto const size{input.size()};
 		auto const start{input.c_str()};
@@ -136,7 +137,7 @@ inline Freight *input() noexcept {
 	while (true) {
 		cout << "> ";
 		string input;
-		if (!sgetline(input)) return nullptr;
+		if (!nextline(input)) return nullptr;
 		if (input.length() == 3) {
 			dest = {input[0], input[1], input[2], '\0'};
 			break;
