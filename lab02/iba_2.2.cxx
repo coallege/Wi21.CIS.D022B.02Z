@@ -33,15 +33,9 @@ private:
 	string aircraft;
 	weight_t weight;
 	IANA destination;
-
 public:
-	explicit Freight() noexcept {};
-	explicit Freight(
-		Type type, string id, string aircraft, weight_t weight, IANA dest
-	) noexcept:
-		uld{type}, uldid{id}, aircraft{aircraft}, weight{weight}, destination{dest}
-	{};
-	inline ~Freight() noexcept;
+	explicit inline Freight() noexcept {};
+	inline ~Freight() noexcept { cout << "Cargo destructor called\n"; };
 
 	// Methods are marked inline by default but no harm in explicitly saying it
 	inline Type getULD()         const noexcept { return uld; }
@@ -61,7 +55,62 @@ public:
 	inline void setWeight(string weight);
 	inline void setDestination(IANA destination) noexcept;
 	inline void setDestination(string destination);
+
+	/// pointer type to one of those string setters declared above
+	using setter = void (Freight::*)(string);
+	/// If the setter throws, prints the error message and prompts again
+	inline void setFromInput(char const *prompt, setter may_throw) noexcept;
 };
+
+/// Will never produce nullptr
+inline Freight *input() noexcept;
+inline void output(Freight const *) noexcept;
+int main() {
+	auto const user_freight{input()};
+	output(user_freight);
+	delete user_freight;
+}
+
+inline Freight *input() noexcept {
+	Freight *freight = new Freight();
+
+	freight->setFromInput("Enter the type/ULD of the freight",
+		&Freight::setULD);
+	freight->setFromInput("Enter an appropriate id",
+		&Freight::setULDID);
+	freight->setFromInput("Enter the aircraft that will be carrying the freight",
+		&Freight::setAircraft);
+	freight->setFromInput("Enter the weight of the freight in kilos",
+		&Freight::setWeight);
+	freight->setFromInput("Enter an IANA for the freight destination",
+		&Freight::setDestination);
+
+	return freight;
+};
+
+inline void output(Freight const *freight) noexcept {
+	cout << "\n"
+		"Unit load type: "         << Freight::str_from_type(freight->getULD()) << "\n"
+		"Unit load abbreviation: " << freight->getULDID3() << "\n"
+		"Unit identifier: "        << freight->getULDID() << "\n"
+		"Aircraft type: "          << freight->getAircraft() << "\n"
+		"Unit weight: "            << freight->getWeight() << "\n"
+		"Unit weight: "            << freight->getDestination().data() << "\n";
+}
+
+/// Gets the nextline from cin.
+/// If user inputs ctrl+c, exits the entire program.
+inline string nextline() noexcept {
+	string temp;
+	getline(cin, temp);
+	if (!cin.good()) {
+		cout << "Interrupt..." << endl;
+		terminate();
+	}
+	return temp;
+}
+
+/* Class Implementation */
 
 inline Freight::Type Freight::type_from_str(string s) {
 	if (s == "container") {
@@ -121,12 +170,20 @@ inline bool Freight::is_pallet_alignment(string str3) noexcept {
 		|| str3 == "PLA";
 }
 
+/// First three characters of this->uldid
 inline string Freight::getULDID3() const {
 	if (this->uldid.size() < 3) {
 		throw exception("The provided string should be at least three characters!");
 	}
 	return this->uldid.substr(0, 3);
 }
+
+/* Setters Implementation */
+/*
+Setters that take `string` will perform checking to make sure the string can be
+parsed correctly. Some setters may throw `exception` which will be caught and
+handled in Freight::setFromInput.
+*/
 
 inline void Freight::setULD(Type uld) {
 	if (uld == Freight::Type::None) {
@@ -192,84 +249,16 @@ inline void Freight::setDestination(string destination) {
 	this->destination = {destination[0], destination[1], destination[2], '\0'};
 };
 
-inline Freight::~Freight() noexcept {
-	cout << "Cargo destructor called\n";
-};
-
-/// Will never produce nullptr
-inline Freight *input() noexcept;
-inline void output(Freight const *) noexcept;
-int main() {
-	auto const user_freight{input()};
-	output(user_freight);
-	delete user_freight;
-}
-
-inline string nextline() {
-	string temp;
-	getline(cin, temp);
-	if (!cin.good()) {
-		cout << "Interrupt..." << endl;
-		terminate();
-	}
-	return temp;
-}
-
-inline Freight *input() noexcept {
-	Freight *freight = new Freight();
-
-	cout << "Enter the type/ULD of the freight:";
-	type:
-	try {
+inline void Freight::setFromInput(char const *prompt, Freight::setter setter) noexcept {
+	cout << prompt << ':';
+	while (true) {
 		cout << "\n> ";
-		freight->setULD(nextline());
-	} catch (exception e) {
-		cout << e.what();
-		goto type;
+		try {
+			(*this.*setter)(nextline());
+		} catch (exception e) {
+			cout << e.what();
+			continue;
+		}
+		break;
 	}
-
-	cout << "Enter an appropriate id:";
-	id:
-	try {
-		cout << "\n> ";
-		freight->setULDID(nextline());
-	} catch (exception e) {
-		cout << e.what();
-		goto id;
-	}
-
-	cout << "Enter the aircraft that will be carrying the freight:\n> ";
-	freight->setAircraft(nextline());
-
-	cout << "Enter the weight of the freight in kilos:";
-	weight:
-	try {
-		cout << "\n> ";
-		freight->setWeight(nextline());
-	} catch (exception e) {
-		cout << e.what();
-		goto weight;
-	}
-
-	cout << "Enter an IANA for the freight destination:";
-	iana:
-	try {
-		cout << "\n> ";
-		freight->setDestination(nextline());
-	} catch (exception e) {
-		cout << e.what();
-		goto iana;
-	}
-
-	return freight;
-};
-
-inline void output(Freight const *freight) noexcept {
-	cout << "\n"
-		"Unit load type: "         << Freight::str_from_type(freight->getULD()) << "\n"
-		"Unit load abbreviation: " << freight->getULDID3() << "\n"
-		"Unit identifier: "        << freight->getULDID() << "\n"
-		"Aircraft type: "          << freight->getAircraft() << "\n"
-		"Unit weight: "            << freight->getWeight() << "\n"
-		"Unit weight: "            << freight->getDestination().data() << "\n";
 }
