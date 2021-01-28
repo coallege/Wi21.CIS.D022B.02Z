@@ -132,7 +132,7 @@ inline string Freight::str_from_type(Freight::Type t) noexcept {
 	switch (t) {
 		case Freight::Type::Container: return "container";
 		case Freight::Type::Pallet: return "pallet";
-		default: return "None";
+		default: return "none";
 	}
 }
 

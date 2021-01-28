@@ -18,13 +18,13 @@ struct Freight {
 	/// weight can't be negative so let's make it impossible to represent
 	using weight_t = uint32_t;
 
-	Freight::Type uld;
+	Type uld;
 	string uldid;
 	string aircraft;
 	weight_t weight;
 	IANA destination;
 	explicit Freight(
-		Freight::Type type, string id, string aircraft, weight_t weight, IANA dest
+		Type type, string id, string aircraft, weight_t weight, IANA dest
 	) noexcept:
 		uld{type}, uldid{id}, aircraft{aircraft}, weight{weight}, destination{dest}
 	{};
@@ -32,20 +32,16 @@ struct Freight {
 
 inline Freight *input() noexcept;
 inline void output(Freight const *) noexcept;
+inline string nextline() noexcept;
+inline bool is_container_alignment(string str3) noexcept;
+inline bool is_pallet_alignment(string str3) noexcept;
+inline uint32_t parse_u32(string s) noexcept;
+constexpr char const *type_to_string(Freight::Type t) noexcept;
+
 int main() {
 	auto user_freight{input()};
-	if (user_freight == nullptr) {
-		cout << "Interrupt...\n";
-		return 1;
-	}
 	output(user_freight);
 	delete user_freight;
-}
-
-/// Returns true on success
-inline bool nextline(string &output) noexcept {
-	getline(cin, output);
-	return cin.good();
 }
 
 inline Freight *input() noexcept {
@@ -53,8 +49,7 @@ inline Freight *input() noexcept {
 	cout << "What type of freight is it?\n";
 	while (true) {
 		cout << "Enter eight 'container' or 'pallet'\n> ";
-		string input;
-		if (!nextline(input)) return nullptr;
+		auto const input{nextline()};
 
 		if (input == "container") {
 			freight_type = {Freight::Type::Container};
@@ -68,82 +63,65 @@ inline Freight *input() noexcept {
 	}
 
 	string id;
-	cout << "Enter an appropriate id:\n";
+	cout << "Enter an appropriate id:";
 	while (true) {
-		cout << "> ";
-		if (!nextline(id)) return nullptr;
+		cout << "\n> ";
+		id = {nextline()};
 
-		auto first3{id.substr(0, 3)};
+		auto const first3{id.substr(0, 3)};
 
-		if (0
-			|| first3 == "AYF"
-			|| first3 == "AYK"
-			|| first3 == "AAA"
-			|| first3 == "AYY"
-		) {
+		if (is_container_alignment(first3)) {
 			if (freight_type == Freight::Type::Container) {
 				break;
+			} else {
+				cout << first3 << " is not an appropriate prefix for Containers!";
+				continue;
 			}
-			cout << first3 << " is not an appropriate prefix for Containers!\n";
-			continue;
 		}
 
-		if (0
-			|| first3 == "PAG"
-			|| first3 == "PMC"
-			|| first3 == "PLA"
-		) {
+		if (is_pallet_alignment(first3)) {
 			if (freight_type == Freight::Type::Pallet) {
 				break;
-			}
-			cout << first3 << " is not an appropriate prefix for Pallets!\n";
-			continue;
-		};
-
-		cout << first3 << " is not a valid prefix!\n";
-	}
-
-	string aircraft;
-	cout << "Enter the aircraft that will be carrying the freight:\n> ";
-	getline(cin, aircraft);
-
-	Freight::weight_t weight;
-	cout << "Enter the weight of the freight in kilos:\n";
-	while (true) {
-		cout << "> ";
-		string input;
-		if (!nextline(input)) return nullptr;
-
-		auto const size{input.size()};
-		auto const start{input.c_str()};
-
-		if (start[0] != '-') {
-			char *last_parsed;
-			weight = {strtoul(start, &last_parsed, 10)};
-
-			auto const chars_parsed{last_parsed - start};
-			if (weight && chars_parsed == size) {
-				break;
+			} else {
+				cout << first3 << " is not an appropriate prefix for Pallets!";
+				continue;
 			}
 		}
 
-		cout << ""
+		cout << first3 << " is not a valid prefix!";
+	}
+
+	cout << "Enter the aircraft that will be carrying the freight:\n> ";
+	auto const aircraft{nextline()};
+
+	Freight::weight_t weight{};
+	cout << "Enter the weight of the freight in kilos:";
+	while (true) {
+		cout << "\n> ";
+		auto const input{nextline()};
+
+		weight = {parse_u32(input)};
+
+		if (weight != 0) {
+			break;
+		}
+
+		cout <<
 			"Invalid input!\n"
-			"Please enter an integral value greater than zero!\n";
+			"Please enter an integral value greater than zero!";
 	}
 
 	IANA dest{};
-	cout << "Enter an IANA for the freight destination:\n";
+	cout << "Enter an IANA for the freight destination:";
 	while (true) {
-		cout << "> ";
-		string input;
-		if (!nextline(input)) return nullptr;
+		cout << "\n> ";
+		auto const input{nextline()};
 		if (input.length() == 3) {
 			dest = {input[0], input[1], input[2], '\0'};
 			break;
 		}
 
-		cout << "An IANA must be three characters!\n";
+		cout << "An IANA must be three characters!";
 	}
 
 	return new Freight(
@@ -155,15 +133,62 @@ inline Freight *input() noexcept {
 	);
 };
 
-constexpr char const *type_to_string(Freight::Type t) noexcept {
-	return t == Freight::Type::Container ? "Container" : "Pallet";
+inline void output(Freight const *freight) noexcept {
+	cout
+		<< "\nuld         = " << type_to_string(freight->uld)
+		<< "\nuldid       = " << freight->uldid
+		<< "\naircraft    = " << freight->aircraft
+		<< "\nweight      = " << freight->weight
+		<< "\ndestination = " << freight->destination.data()
+		<< "\n";
 }
 
-inline void output(Freight const *freight) noexcept {
-	cout << ""
-	"uld         = " << type_to_string(freight->uld) << "\n"
-	"uldid       = " << freight->uldid << "\n"
-	"aircraft    = " << freight->aircraft << "\n"
-	"weight      = " << freight->weight << "\n"
-	"destination = " << freight->destination.data() << "\n";
+inline string nextline() noexcept {
+	string temp;
+	getline(cin, temp);
+	if (!cin.good()) {
+		terminate();
+	}
+	return temp;
+}
+
+inline bool is_container_alignment(string str3) noexcept {
+	return 0
+		|| str3 == "AYF"
+		|| str3 == "AYK"
+		|| str3 == "AAA"
+		|| str3 == "AYY";
+}
+
+inline bool is_pallet_alignment(string str3) noexcept {
+	return 0
+		|| str3 == "PAG"
+		|| str3 == "PMC"
+		|| str3 == "PLA";
+}
+
+/// Returns zero on failure
+inline uint32_t parse_u32(string s) noexcept {
+	auto const size{s.size()};
+	auto const start{s.c_str()};
+
+	uint32_t temp;
+
+	if (start[0] == '-') {
+		return 0;
+	}
+
+	char *last_parsed;
+	temp = {strtoul(start, &last_parsed, 10)};
+
+	auto const chars_parsed{last_parsed - start};
+	if (temp && chars_parsed == size) {
+		return temp;
+	}
+
+	return 0;
+}
+
+constexpr char const *type_to_string(Freight::Type t) noexcept {
+	return t == Freight::Type::Container ? "container" : "pallet";
 }
