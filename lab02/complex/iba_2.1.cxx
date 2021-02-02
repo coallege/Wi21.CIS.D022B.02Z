@@ -1,3 +1,12 @@
+/*
+Cole Gannon
+Winter 2021
+Lab 02
+Problem 2.1
+Description of problem:
+
+*/
+
 #include <cstdint>
 #include <cstdlib>
 #include <string>
@@ -5,9 +14,6 @@
 #include <iostream>
 
 using namespace std;
-
-// we're gonna borrow a character for the null byte
-using IANA = array<char, 4>;
 
 struct Freight {
 	enum class Type: uint8_t {
@@ -22,9 +28,9 @@ struct Freight {
 	string uldid;
 	string aircraft;
 	weight_t weight;
-	IANA destination;
+	string destination;
 	explicit Freight(
-		Type type, string id, string aircraft, weight_t weight, IANA dest
+		Type type, string id, string aircraft, weight_t weight, string dest
 	) noexcept:
 		uld{type}, uldid{id}, aircraft{aircraft}, weight{weight}, destination{dest}
 	{};
@@ -69,7 +75,7 @@ inline Freight *input() noexcept {
 		id = {nextline()};
 
 		auto const first3{id.substr(0, 3)};
-
+	
 		if (is_container_alignment(first3)) {
 			if (freight_type == Freight::Type::Container) {
 				break;
@@ -111,13 +117,13 @@ inline Freight *input() noexcept {
 			"Please enter an integral value greater than zero!";
 	}
 
-	IANA dest{};
+	string dest;
 	cout << "Enter an IANA for the freight destination:";
 	while (true) {
 		cout << "\n> ";
 		auto const input{nextline()};
 		if (input.length() == 3) {
-			dest = {input[0], input[1], input[2], '\0'};
+			dest = {input};
 			break;
 		}
 

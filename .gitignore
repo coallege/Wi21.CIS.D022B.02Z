@@ -2,3 +2,4 @@
 *.exe
 *.pdb
 !/misc/space_cat.exe
+/misc/suffer.cxx

@@ -34,10 +34,10 @@ private:
 	weight_t weight;
 	IANA destination;
 public:
+	// Methods are marked inline by default but no harm in explicitly saying it
 	explicit inline Freight() noexcept {};
 	inline ~Freight() noexcept { cout << "Cargo destructor called\n"; };
 
-	// Methods are marked inline by default but no harm in explicitly saying it
 	inline Type getULD()         const noexcept { return uld; }
 	inline string getULDID()     const noexcept { return uldid; }
 	inline string getAircraft()  const noexcept { return aircraft; }
@@ -190,7 +190,7 @@ inline void Freight::setULD(Type uld) {
 		throw exception("The freight's type must be either Container or Pallet!");
 	}
 
-	this->uld = uld;
+	this->uld = {uld};
 }
 
 inline void Freight::setULD(string uld) {
@@ -206,15 +206,15 @@ inline void Freight::setULDID(string uldid) {
 		throw exception("The provided uldid does not match the uld of the Freight!");
 	}
 
-	this->uldid = uldid;
+	this->uldid = {uldid};
 };
 
 inline void Freight::setAircraft(string aircraft) noexcept {
-	this->aircraft = aircraft;
+	this->aircraft = {aircraft};
 };
 
 inline void Freight::setWeight(Freight::weight_t weight) noexcept {
-	this->weight = weight;
+	this->weight = {weight};
 };
 
 inline void Freight::setWeight(string weightstr) {
@@ -238,7 +238,7 @@ inline void Freight::setWeight(string weightstr) {
 };
 
 inline void Freight::setDestination(IANA destination) noexcept {
-	this->destination = destination;
+	this->destination = {destination};
 };
 
 inline void Freight::setDestination(string destination) {
