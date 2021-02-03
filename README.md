@@ -20,3 +20,22 @@ don't figure out how to code effectively.
 
 The prof for this course seems pretty baller.
 I think this is going to be a fun one.
+
+## Learnings
+
+Constructor uniform field initialization:
+
+```cpp
+// as seen in @coalpha/coalpha.github.io/cxx/constructor_initializer.cxx
+class NoError {
+   char c;
+public:
+   NoError(int c): c(c) {};
+};
+
+class HasError {
+   char c;
+public:
+   HasError(int c): c{c} {};
+};
+```
