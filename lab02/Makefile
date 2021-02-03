@@ -1,7 +1,11 @@
-release_flags := -O2
+iba_2.1.release.exe: iba_2.1.cxx
+	clang++ -fno-exceptions -fno-rtti -O2 -Wall $< -o $@
 
-run1: run~gannon_lab2.1
+iba_2.2.release.exe: iba_2.2.cxx
+	clang++ -O2 -Wall $< -o $@
 
-run2: run~gannon_lab2.2
+run~2.1: iba_2.1.release.exe
+	@-$<
 
-include ../Makefile
+run~2.2: iba_2.2.release.exe
+	@-$<

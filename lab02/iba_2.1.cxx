@@ -4,20 +4,18 @@ Winter 2021
 Lab 02
 Problem 2.1
 Description of problem:
-Take user input and store it in a Freight/Cargo struct.
+Take user input and store it in a Cargo/Cargo struct.
 Then output the struct contents.
 */
-// can be compiled with -fno-exceptions -fno-rtti
 #include <cstdint>
 #include <cstdlib>
 #include <string>
 #include <array>
 #include <iostream>
-#define loop for(;;)
 
 using namespace std;
 
-struct Freight {
+struct Cargo {
 	string uld;
 	string abbreviation;
 	string uldid;
@@ -25,7 +23,7 @@ struct Freight {
 	uint32_t weight;
 	string destination;
 	// simple init constructor
-	explicit Freight(
+	explicit Cargo(
 		string type,
 		string abbreviation,
 		string id,
@@ -42,31 +40,31 @@ struct Freight {
 	{};
 };
 
-inline Freight *input() noexcept;
-inline void output(Freight const *) noexcept;
+inline Cargo *input() noexcept;
+inline void output(Cargo const *) noexcept;
 inline void safe_getline(string &) noexcept;
 inline bool is_container_alignment(string) noexcept;
 inline bool is_pallet_alignment(string) noexcept;
 inline uint32_t parse_u32(string) noexcept;
 
 int main() {
-	Freight const *user_freight{input()};
-	output(user_freight);
-	delete user_freight;
-	user_freight = {nullptr};
+	Cargo const *user_cargo{input()};
+	output(user_cargo);
+	delete user_cargo;
+	user_cargo = {nullptr};
 }
 
-inline Freight *input() noexcept {
-	string freight_type;
-	cout << "What type of freight is it?\n";
+inline Cargo *input() noexcept {
+	string cargo_type;
+	cout << "What type of cargo is it?\n";
 	do {
 		cout << "Enter either 'container' or 'pallet'\n> ";
-		safe_getline(freight_type);
-	} while (freight_type == "container" || freight_type == "pallet");
+		safe_getline(cargo_type);
+	} while (cargo_type != "container" && cargo_type != "pallet");
 
 	string abbr;
 	cout << "Enter the unit abbreviation:";
-	loop {
+	while(true) {
 		cout << "\n> ";
 		safe_getline(abbr);
 
@@ -76,14 +74,14 @@ inline Freight *input() noexcept {
 		}
 
 		if (is_container_alignment(abbr)) {
-			if (freight_type == "container") break;
+			if (cargo_type == "container") break;
 
 			cout << abbr << " is not an appropriate prefix for Containers!";
 			continue;
 		}
 
 		if (is_pallet_alignment(abbr)) {
-			if (freight_type == "pallet") break;
+			if (cargo_type == "pallet") break;
 
 			cout << abbr << " is not an appropriate prefix for Pallets!";
 			continue;
@@ -93,16 +91,16 @@ inline Freight *input() noexcept {
 	}
 
 	string id;
-	cout << "Enter the id:";
+	cout << "Enter the id:\n> ";
 	safe_getline(id);
 
-	cout << "Enter the aircraft that will be carrying the freight:\n> ";
+	cout << "Enter the aircraft that will be carrying the cargo:\n> ";
 	string aircraft;
 	safe_getline(aircraft);
 
 	uint32_t weight;
-	cout << "Enter the weight of the freight in kilos:";
-	loop {
+	cout << "Enter the weight of the cargo in kilos:";
+	while(true) {
 		cout << "\n> ";
 		string input;
 		safe_getline(input);
@@ -119,8 +117,8 @@ inline Freight *input() noexcept {
 	}
 
 	string dest;
-	cout << "Enter an IANA for the freight destination:";
-	loop {
+	cout << "Enter an IANA for the cargo destination:";
+	while(true) {
 		cout << "\n> ";
 		safe_getline(dest);
 
@@ -131,16 +129,17 @@ inline Freight *input() noexcept {
 		cout << "An IANA must be three characters!";
 	}
 
-	return new Freight(freight_type, abbr, id, aircraft, weight, dest);
+	return new Cargo(cargo_type, abbr, id, aircraft, weight, dest);
 };
 
-inline void output(Freight const *freight) noexcept {
+inline void output(Cargo const *cargo) noexcept {
 	cout
-		<< "\nuld         = " << freight->uld
-		<< "\nuldid       = " << freight->uldid
-		<< "\naircraft    = " << freight->aircraft
-		<< "\nweight      = " << freight->weight
-		<< "\ndestination = " << freight->destination
+		<< "\nuld          = " << cargo->uld
+		<< "\nabbreviation = " << cargo->abbreviation
+		<< "\nuldid        = " << cargo->uldid
+		<< "\naircraft     = " << cargo->aircraft
+		<< "\nweight       = " << cargo->weight
+		<< "\ndestination  = " << cargo->destination
 		<< "\n";
 }
 

@@ -4,7 +4,7 @@ Winter 2021
 Lab 02
 Problem 2.1
 Description of problem:
-Take user input and store it in a Freight/Cargo class.
+Take user input and store it in a Cargo/Cargo class.
 Then output the class contents.
 */
 #include <cstdint>
@@ -15,7 +15,7 @@ Then output the class contents.
 
 using namespace std;
 
-class Freight {
+class Cargo {
 // Static stuff that needs to be used from the outside
 public:
 	static inline string id_alignment(string) noexcept;
@@ -30,8 +30,8 @@ private:
 	string destination;
 public:
 	// Methods are marked inline by default but no harm in explicitly saying it
-	explicit inline Freight() noexcept {};
-	inline ~Freight() noexcept { cout << "Cargo destructor called\n"; };
+	explicit inline Cargo() noexcept {};
+	inline ~Cargo() noexcept { cout << "Cargo destructor called\n"; };
 
 	inline string get_uld()          const noexcept { return uld; }
 	inline string get_abbreviation() const noexcept { return abbreviation; }
@@ -51,47 +51,47 @@ public:
 	inline void set_destination(string);
 
 	/// pointer type to one of those string setters declared above
-	using setter = void (Freight::*)(string);
+	using setter = void (Cargo::*)(string);
 	/// If the setter throws, prints the error message and prompts again
 	inline void set_from_input(char const *prompt, setter may_throw) noexcept;
 };
 
 /// Will never produce nullptr
-inline Freight *input() noexcept;
-inline void output(Freight const *) noexcept;
+inline Cargo *input() noexcept;
+inline void output(Cargo const *) noexcept;
 int main() {
-	auto const user_freight{input()};
-	output(user_freight);
-	delete user_freight;
+	auto const user_cargo{input()};
+	output(user_cargo);
+	delete user_cargo;
 }
 
-inline Freight *input() noexcept {
-	Freight *freight = new Freight();
+inline Cargo *input() noexcept {
+	Cargo *cargo = new Cargo();
 
-	freight->set_from_input("Enter the type/ULD of the freight",
-		&Freight::set_uld);
-	freight->set_from_input("Enter the abbreviation",
-		&Freight::set_abbreviation);
-	freight->set_from_input("Enter an appropriate id",
-		&Freight::set_uldid);
-	freight->set_from_input("Enter the aircraft that will be carrying the freight",
-		&Freight::set_aircraft);
-	freight->set_from_input("Enter the weight of the freight in kilos",
-		&Freight::set_weight);
-	freight->set_from_input("Enter an IANA for the freight destination",
-		&Freight::set_destination);
+	cargo->set_from_input("Enter the type/ULD of the cargo",
+		&Cargo::set_uld);
+	cargo->set_from_input("Enter the abbreviation",
+		&Cargo::set_abbreviation);
+	cargo->set_from_input("Enter an appropriate id",
+		&Cargo::set_uldid);
+	cargo->set_from_input("Enter the aircraft that will be carrying the cargo",
+		&Cargo::set_aircraft);
+	cargo->set_from_input("Enter the weight of the cargo in kilos",
+		&Cargo::set_weight);
+	cargo->set_from_input("Enter an IANA for the cargo destination",
+		&Cargo::set_destination);
 
-	return freight;
+	return cargo;
 };
 
-inline void output(Freight const *freight) noexcept {
+inline void output(Cargo const *cargo) noexcept {
 	cout << "\n"
-		"Unit load type: "         << freight->get_uld() << "\n"
-		"Unit load abbreviation: " << freight->get_abbreviation() << "\n"
-		"Unit identifier: "        << freight->get_uldid() << "\n"
-		"Aircraft type: "          << freight->get_aircraft() << "\n"
-		"Unit weight: "            << freight->get_weight() << "\n"
-		"Unit weight: "            << freight->get_destination() << "\n";
+		"Unit load type: "         << cargo->get_uld() << "\n"
+		"Unit load abbreviation: " << cargo->get_abbreviation() << "\n"
+		"Unit identifier: "        << cargo->get_uldid() << "\n"
+		"Aircraft type: "          << cargo->get_aircraft() << "\n"
+		"Unit weight: "            << cargo->get_weight() << "\n"
+		"Unit weight: "            << cargo->get_destination() << "\n";
 }
 
 /// Gets the nextline from cin.
@@ -106,7 +106,7 @@ inline string nextline() noexcept {
 	return temp;
 }
 
-inline bool Freight::is_container_alignment(string str3) noexcept {
+inline bool Cargo::is_container_alignment(string str3) noexcept {
 	return 0
 		|| str3 == "AYF"
 		|| str3 == "AYK"
@@ -114,7 +114,7 @@ inline bool Freight::is_container_alignment(string str3) noexcept {
 		|| str3 == "AYY";
 }
 
-inline bool Freight::is_pallet_alignment(string str3) noexcept {
+inline bool Cargo::is_pallet_alignment(string str3) noexcept {
 	return 0
 		|| str3 == "PAG"
 		|| str3 == "PMC"
@@ -124,9 +124,9 @@ inline bool Freight::is_pallet_alignment(string str3) noexcept {
 /* Setters Implementation
 Setters that take `string` will perform checking to make sure the string can be
 parsed correctly. Some setters may throw `exception` which will be caught and
-handled in Freight::setFromInput.
+handled in Cargo::setFromInput.
 */
-inline void Freight::set_uld(string uld) {
+inline void Cargo::set_uld(string uld) {
 	if (uld != "container" && uld != "pallet") {
 		throw exception("The ULD must be either \"container\" or \"pallet\"!");
 	}
@@ -134,7 +134,7 @@ inline void Freight::set_uld(string uld) {
 	this->uld = {uld};
 }
 
-inline void Freight::set_abbreviation(string abbr) {
+inline void Cargo::set_abbreviation(string abbr) {
 	if (abbr.length() != 3) {
 		throw exception("The abbreviation must be three characters!");
 	}
@@ -154,19 +154,19 @@ inline void Freight::set_abbreviation(string abbr) {
 	this->abbreviation = {abbr};
 }
 
-inline void Freight::set_uldid(string uldid) noexcept {
+inline void Cargo::set_uldid(string uldid) noexcept {
 	this->uldid = {uldid};
 };
 
-inline void Freight::set_aircraft(string aircraft) noexcept {
+inline void Cargo::set_aircraft(string aircraft) noexcept {
 	this->aircraft = {aircraft};
 };
 
-inline void Freight::set_weight(uint32_t weight) noexcept {
+inline void Cargo::set_weight(uint32_t weight) noexcept {
 	this->weight = {weight};
 };
 
-inline void Freight::set_weight(string weightstr) {
+inline void Cargo::set_weight(string weightstr) {
 	if (weightstr[0] == '-') {
 		throw exception("The weight cannot be negative!");
 	}
@@ -174,7 +174,7 @@ inline void Freight::set_weight(string weightstr) {
 	this->set_weight(stoul(weightstr));
 };
 
-inline void Freight::set_destination(string destination) {
+inline void Cargo::set_destination(string destination) {
 	if (destination.length() != 3) {
 		throw exception("The destination string must be three characters!");
 	}
@@ -182,7 +182,7 @@ inline void Freight::set_destination(string destination) {
 	this->destination = {destination};
 };
 
-inline void Freight::set_from_input(char const *prompt, Freight::setter setter) noexcept {
+inline void Cargo::set_from_input(char const *prompt, Cargo::setter setter) noexcept {
 	cout << prompt << ':';
 	while (true) {
 		cout << "\n> ";
