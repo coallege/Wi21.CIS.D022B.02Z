@@ -5,7 +5,9 @@ Lab 02
 Problem 2.1
 Description of problem:
 Take user input and store it in a Freight/Cargo struct.
+Then output the struct contents.
 */
+// can be compiled with -fno-exceptions -fno-rtti
 #include <cstdint>
 #include <cstdlib>
 #include <string>
