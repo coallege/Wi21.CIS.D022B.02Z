@@ -1,3 +1,3 @@
 suffer.exe: suffer.cxx
-	clang++ $< -o $@
-	$@
+	@-clang++ $< -o $@
+	@-$@ | clip
