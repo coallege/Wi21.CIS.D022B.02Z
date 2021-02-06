@@ -12,25 +12,43 @@ Then output the class contents.
 #include <exception>
 #include <string>
 #include <iostream>
+#include <algorithm>
+#include <cctype>
 
 using namespace std;
 
 class Cargo {
 // Static stuff that needs to be used from the outside
+// Methods are marked inline by default but no harm in explicitly saying it
 public:
 	static inline string id_alignment(string) noexcept;
 	static inline bool is_container_alignment(string) noexcept;
 	static inline bool is_pallet_alignment(string) noexcept;
 private:
-	string uld;
-	string abbreviation;
-	string uldid;
-	string aircraft;
-	uint32_t weight;
-	string destination;
+	string uld{"unknown"};
+	string abbreviation{"---"};
+	string uldid{"--------IB"};
+	string aircraft{"unknown"};
+	uint32_t weight{};
+	string destination{"---"};
 public:
-	// Methods are marked inline by default but no harm in explicitly saying it
 	explicit inline Cargo() noexcept {};
+	/// 5 arg constructor that is never used
+	explicit inline Cargo(
+		string type,
+		string abbr,
+		string id,
+		string aircraft,
+		uint32_t weight,
+		string dest
+	) noexcept {
+		set_uld(type);
+		set_abbreviation(abbr);
+		set_uldid(id);
+		set_aircraft(aircraft);
+		set_weight(weight);
+		set_destination(dest);
+	};
 	inline ~Cargo() noexcept { cout << "Cargo destructor called\n"; };
 
 	inline string get_uld()          const noexcept { return uld; }
@@ -44,7 +62,7 @@ public:
 
 	inline void set_uld(string);
 	inline void set_abbreviation(string);
-	inline void set_uldid(string) noexcept;
+	inline void set_uldid(string);
 	inline void set_aircraft(string) noexcept;
 	inline void set_weight(uint32_t) noexcept;
 	inline void set_weight(string);
@@ -57,22 +75,24 @@ public:
 };
 
 /// Will never produce nullptr
-inline Cargo *input() noexcept;
+inline void input(Cargo *) noexcept;
 inline void output(Cargo const *) noexcept;
 int main() {
-	auto const user_cargo{input()};
+	auto user_cargo{new Cargo};
+	output(user_cargo);
+	input(user_cargo);
 	output(user_cargo);
 	delete user_cargo;
+	user_cargo = {nullptr};
 }
 
-inline Cargo *input() noexcept {
-	Cargo *cargo = new Cargo();
-
-	cargo->set_from_input("Enter the type/ULD of the cargo",
+inline void input(Cargo *cargo) noexcept {
+	cout << '\n';
+	cargo->set_from_input("Enter the type/ULD of the cargo (container/pallet)",
 		&Cargo::set_uld);
 	cargo->set_from_input("Enter the abbreviation",
 		&Cargo::set_abbreviation);
-	cargo->set_from_input("Enter an appropriate id",
+	cargo->set_from_input("Enter a five digit id",
 		&Cargo::set_uldid);
 	cargo->set_from_input("Enter the aircraft that will be carrying the cargo",
 		&Cargo::set_aircraft);
@@ -80,18 +100,17 @@ inline Cargo *input() noexcept {
 		&Cargo::set_weight);
 	cargo->set_from_input("Enter an IANA for the cargo destination",
 		&Cargo::set_destination);
-
-	return cargo;
+	cout << '\n';
 };
 
 inline void output(Cargo const *cargo) noexcept {
-	cout << "\n"
+	cout << ""
 		"Unit load type: "         << cargo->get_uld() << "\n"
 		"Unit load abbreviation: " << cargo->get_abbreviation() << "\n"
 		"Unit identifier: "        << cargo->get_uldid() << "\n"
 		"Aircraft type: "          << cargo->get_aircraft() << "\n"
 		"Unit weight: "            << cargo->get_weight() << "\n"
-		"Unit weight: "            << cargo->get_destination() << "\n";
+		"Destination code: "       << cargo->get_destination() << "\n";
 }
 
 /// Gets the nextline from cin.
@@ -154,8 +173,13 @@ inline void Cargo::set_abbreviation(string abbr) {
 	this->abbreviation = {abbr};
 }
 
-inline void Cargo::set_uldid(string uldid) noexcept {
-	this->uldid = {uldid};
+inline void Cargo::set_uldid(string uldid) {
+	if (uldid.length() == 5 && all_of(uldid.begin(), uldid.end(), isdigit)) {
+		this->uldid = {this->abbreviation + uldid + "IB"};
+		return;
+	}
+
+	throw exception("The id must be 5 digits!");
 };
 
 inline void Cargo::set_aircraft(string aircraft) noexcept {

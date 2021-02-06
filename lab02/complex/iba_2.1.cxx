@@ -4,7 +4,6 @@ Winter 2021
 Lab 02
 Problem 2.1
 Description of problem:
-
 */
 
 #include <cstdint>
@@ -75,7 +74,7 @@ inline Freight *input() noexcept {
 		id = {nextline()};
 
 		auto const first3{id.substr(0, 3)};
-	
+
 		if (is_container_alignment(first3)) {
 			if (freight_type == Freight::Type::Container) {
 				break;

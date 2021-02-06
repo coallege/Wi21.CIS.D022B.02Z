@@ -12,6 +12,8 @@ Then output the struct contents.
 #include <string>
 #include <array>
 #include <iostream>
+#include <algorithm>
+#include <cctype>
 
 using namespace std;
 
@@ -91,8 +93,20 @@ inline Cargo *input() noexcept {
 	}
 
 	string id;
-	cout << "Enter the id:\n> ";
-	safe_getline(id);
+	cout << "Enter a five digit id:";
+	while (true) {
+		cout << "\n> ";
+		safe_getline(id);
+
+		if (id.length() == 5 && all_of(id.begin(), id.end(), isdigit)) {
+			break;
+		}
+
+		cout << "The id must be 5 digits!";
+	}
+
+	// make the ID well formed
+	id = abbr + id + "IB";
 
 	cout << "Enter the aircraft that will be carrying the cargo:\n> ";
 	string aircraft;
