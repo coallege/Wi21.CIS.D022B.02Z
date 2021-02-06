@@ -1,11 +1,3 @@
-/*
-Cole Gannon
-Winter 2021
-Lab 02
-Problem 2.1
-Description of problem:
-*/
-
 #include <cstdint>
 #include <cstdlib>
 #include <string>

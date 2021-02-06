@@ -59,7 +59,6 @@ public:
 	inline string get_destination()  const noexcept { return destination; }
 
 	// Setters can be declared out of line since they include input verification
-
 	inline void set_uld(string);
 	inline void set_abbreviation(string);
 	inline void set_uldid(string);
@@ -74,7 +73,6 @@ public:
 	inline void set_from_input(char const *prompt, setter may_throw) noexcept;
 };
 
-/// Will never produce nullptr
 inline void input(Cargo *) noexcept;
 inline void output(Cargo const *) noexcept;
 int main() {
@@ -143,7 +141,7 @@ inline bool Cargo::is_pallet_alignment(string str3) noexcept {
 /* Setters Implementation
 Setters that take `string` will perform checking to make sure the string can be
 parsed correctly. Some setters may throw `exception` which will be caught and
-handled in Cargo::setFromInput.
+handled in Cargo::set_from_input.
 */
 inline void Cargo::set_uld(string uld) {
 	if (uld != "container" && uld != "pallet") {
@@ -206,6 +204,10 @@ inline void Cargo::set_destination(string destination) {
 	this->destination = {destination};
 };
 
+/// Takes a prompt and a method
+/// Prints the exceptions that are thrown
+/// Runs until no exceptions are thrown
+/// Cargo::setter is a first class function kinda deal
 inline void Cargo::set_from_input(char const *prompt, Cargo::setter setter) noexcept {
 	cout << prompt << ':';
 	while (true) {
