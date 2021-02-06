@@ -9,11 +9,9 @@ Then output the struct contents.
 */
 #include <cstdint>
 #include <cstdlib>
-#include <ctype.h>
-#include <string>
-#include <array>
-#include <iostream>
 #include <cctype>
+#include <string>
+#include <iostream>
 
 using ul = unsigned long;
 using namespace std;

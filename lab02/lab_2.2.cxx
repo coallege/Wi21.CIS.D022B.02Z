@@ -9,9 +9,9 @@ Then output the class contents.
 */
 #include <cstdint>
 #include <cstdlib>
+#include <cctype>
 #include <string>
 #include <iostream>
-#include <cctype>
 
 using namespace std;
 
