@@ -9,12 +9,13 @@ Then output the struct contents.
 */
 #include <cstdint>
 #include <cstdlib>
+#include <ctype.h>
 #include <string>
 #include <array>
 #include <iostream>
-#include <algorithm>
 #include <cctype>
 
+using ul = unsigned long;
 using namespace std;
 
 struct Cargo {
@@ -22,7 +23,7 @@ struct Cargo {
 	string abbreviation;
 	string uldid;
 	string aircraft;
-	uint32_t weight;
+	ul weight;
 	string destination;
 	// simple init constructor
 	explicit Cargo(
@@ -47,7 +48,8 @@ inline void output(Cargo const *) noexcept;
 inline void safe_getline(string &) noexcept;
 inline bool is_container_alignment(string) noexcept;
 inline bool is_pallet_alignment(string) noexcept;
-inline uint32_t parse_u32(string) noexcept;
+inline bool all_digits(string) noexcept;
+inline ul parse_ul(string) noexcept;
 
 int main() {
 	Cargo const *user_cargo{input()};
@@ -98,7 +100,7 @@ inline Cargo *input() noexcept {
 		cout << "\n> ";
 		safe_getline(id);
 
-		if (id.length() == 5 && all_of(id.begin(), id.end(), isdigit)) {
+		if (id.length() == 5 && all_digits(id)) {
 			break;
 		}
 
@@ -112,14 +114,14 @@ inline Cargo *input() noexcept {
 	string aircraft;
 	safe_getline(aircraft);
 
-	uint32_t weight;
+	ul weight;
 	cout << "Enter the weight of the cargo in kilos:";
 	while(true) {
 		cout << "\n> ";
 		string input;
 		safe_getline(input);
 
-		weight = {parse_u32(input)};
+		weight = {parse_ul(input)};
 
 		if (weight != 0) {
 			break;
@@ -182,13 +184,22 @@ inline bool is_pallet_alignment(string str3) noexcept {
 		|| str3 == "PLA";
 }
 
+inline bool all_digits(string s) noexcept {
+	for (auto &&c : s) {
+		if (!isdigit(c)) {
+			return false;
+		}
+	}
+	return true;
+}
+
 /// String to integer parsing without exceptions using strtoul.
 /// Returns zero on error.
-inline uint32_t parse_u32(string s) noexcept {
+inline ul parse_ul(string s) noexcept {
 	auto const size{s.size()};
 	auto const start{s.c_str()};
 
-	uint32_t temp;
+	ul temp;
 
 	if (start[0] == '-') {
 		return 0;

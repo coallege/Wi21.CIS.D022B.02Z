@@ -2,17 +2,15 @@
 Cole Gannon
 Winter 2021
 Lab 02
-Problem 2.1
+Problem 2.2
 Description of problem:
 Take user input and store it in a Cargo/Cargo class.
 Then output the class contents.
 */
 #include <cstdint>
 #include <cstdlib>
-#include <exception>
 #include <string>
 #include <iostream>
-#include <algorithm>
 #include <cctype>
 
 using namespace std;
@@ -145,7 +143,7 @@ handled in Cargo::set_from_input.
 */
 inline void Cargo::set_uld(string uld) {
 	if (uld != "container" && uld != "pallet") {
-		throw exception("The ULD must be either \"container\" or \"pallet\"!");
+		throw string("The ULD must be either \"container\" or \"pallet\"!");
 	}
 
 	this->uld = {uld};
@@ -153,31 +151,40 @@ inline void Cargo::set_uld(string uld) {
 
 inline void Cargo::set_abbreviation(string abbr) {
 	if (abbr.length() != 3) {
-		throw exception("The abbreviation must be three characters!");
+		throw string("The abbreviation must be three characters!");
 	}
 
 	if (is_container_alignment(abbr)) {
 		if (this->uld != "container") {
-			throw exception("Container abbreviation does not match the current uld!");
+			throw string("Container abbreviation does not match the current uld!");
 		}
 	} else if (is_pallet_alignment(abbr)) {
 		if (this->uld != "pallet") {
-			throw exception("Pallet abbreviation does not match the current uld!");
+			throw string("Pallet abbreviation does not match the current uld!");
 		}
 	} else {
-		throw exception("Invalid abbreviation!");
+		throw string("Invalid abbreviation!");
 	}
 
 	this->abbreviation = {abbr};
 }
 
+inline bool all_digits(string s) noexcept {
+	for (auto &&c : s) {
+		if (!isdigit(c)) {
+			return false;
+		}
+	}
+	return true;
+}
+
 inline void Cargo::set_uldid(string uldid) {
-	if (uldid.length() == 5 && all_of(uldid.begin(), uldid.end(), isdigit)) {
+	if (uldid.length() == 5 && all_digits(uldid)) {
 		this->uldid = {this->abbreviation + uldid + "IB"};
 		return;
 	}
 
-	throw exception("The id must be 5 digits!");
+	throw string("The id must be 5 digits!");
 };
 
 inline void Cargo::set_aircraft(string aircraft) noexcept {
@@ -190,7 +197,7 @@ inline void Cargo::set_weight(uint32_t weight) noexcept {
 
 inline void Cargo::set_weight(string weightstr) {
 	if (weightstr[0] == '-') {
-		throw exception("The weight cannot be negative!");
+		throw string("The weight cannot be negative!");
 	}
 
 	this->set_weight(stoul(weightstr));
@@ -198,7 +205,7 @@ inline void Cargo::set_weight(string weightstr) {
 
 inline void Cargo::set_destination(string destination) {
 	if (destination.length() != 3) {
-		throw exception("The destination string must be three characters!");
+		throw string("The destination string must be three characters!");
 	}
 
 	this->destination = {destination};
@@ -214,8 +221,8 @@ inline void Cargo::set_from_input(char const *prompt, Cargo::setter setter) noex
 		cout << "\n> ";
 		try {
 			(*this.*setter)(nextline());
-		} catch (exception e) {
-			cout << e.what();
+		} catch (string e) {
+			cout << e;
 			continue;
 		}
 		break;
