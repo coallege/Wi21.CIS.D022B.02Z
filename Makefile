@@ -3,23 +3,31 @@ proot := $(dir $(lastword $(MAKEFILE_LIST)))
 
 space_cat = $(shell $(proot)/misc/space_cat.exe $(proot)/$(1))
 
-cxx_flags      = $(call space_cat,compile_flags.txt)
-release_flags ?= $(call space_cat,release_flags.txt)
+cxx_flags  ?= $(call space_cat,compile_flags.txt)
+cxx_dflags ?= -g
+cxx_rflags ?= -O2
+
+ifeq ($(OS), Windows_NT)
+	exe=exe
+	cxx_flags += -fuse-ld=lld-link
+else
+	exe=elf
+endif
 
 root-default:
-	@echo you$$ make run~program.exe
+	@echo you$$ make run~program
 
-%.debug.exe: %.cxx
-	$(cxx) $(cxx_flags) -g $< -o $@
+%.$(exe): %.cxx
+	$(cxx) $(cxx_flags) $< -o $@
 
-run~%: %.debug.exe
-	@$<
+%.debug.$(exe): %.cxx
+	@$(cxx) $(cxx_flags) $(cxx_dflags) $< -o $@
 
-%.release.exe: %.cxx
-	$(cxx) $(cxx_flags) $(release_flags) $< -o $@
+%.release.$(exe): %.cxx
+	@$(cxx) $(cxx_flags) $(cxx_rflags) $< -o $@
 
-run-release~%: %.release.exe
-	@$<
+run~%: %.$(exe)
+	@-./$<
 
 .SECONDARY:
 

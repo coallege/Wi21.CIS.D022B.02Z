@@ -15,8 +15,6 @@ Then output the class contents.
 using namespace std;
 
 class Cargo {
-// Static stuff that needs to be used from the outside
-// Methods are marked inline by default but no harm in explicitly saying it
 public:
 	static inline string id_alignment(string) noexcept;
 	static inline bool is_container_alignment(string) noexcept;
@@ -30,22 +28,6 @@ private:
 	string destination{"---"};
 public:
 	explicit inline Cargo() noexcept {};
-	/// 5 arg constructor that is never used
-	explicit inline Cargo(
-		string type,
-		string abbr,
-		string id,
-		string aircraft,
-		double weight,
-		string dest
-	) noexcept {
-		set_uld(type);
-		set_abbreviation(abbr);
-		set_uldid(id);
-		set_aircraft(aircraft);
-		set_weight(weight);
-		set_destination(dest);
-	};
 	inline ~Cargo() noexcept { cout << "Cargo destructor called\n"; };
 
 	inline string get_uld()          const noexcept { return uld; }
@@ -200,11 +182,14 @@ inline void kilotopound(Cargo *self) noexcept {
 }
 
 inline void Cargo::set_weight(string weightstr) {
-	if (weightstr[0] == '-') {
-		throw string("The weight cannot be negative!");
+	double weight;
+	try {
+		weight = {stod(weightstr)};
+	} catch (...) {
+		throw string("Invalid double! Try again:");
 	}
 
-	this->set_weight(stod(weightstr));
+	this->weight = {weight};
 
 	cout << "Is the weight in 'kilos' or 'pounds'?";
 	while (true) {
@@ -237,12 +222,9 @@ inline void Cargo::set_from_input(char const *prompt, Cargo::setter setter) noex
 		cout << "\n> ";
 		try {
 			(*this.*setter)(nextline());
+			break;
 		} catch (string e) {
 			cout << e;
-			continue;
-		} catch (exception e) {
-			cout << e.what();
 		}
-		break;
 	}
 }

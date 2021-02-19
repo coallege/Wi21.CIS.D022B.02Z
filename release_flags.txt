@@ -1,3 +1,0 @@
--fno-exceptions
--fno-rtti
--O2

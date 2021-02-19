@@ -1,5 +1,7 @@
 ~*
 *.exe
+*.elf
 *.pdb
+*.ilk
 !/misc/space_cat.exe
 /misc/suffer.cxx

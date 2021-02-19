@@ -1,3 +1,2 @@
 -std=c++17
 -Wall
--fuse-ld=lld-link
