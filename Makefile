@@ -29,6 +29,9 @@ root-default:
 run~%: %.$(exe)
 	@-./$<
 
+revision:
+	node $(proot)/misc/revision.js
+
 .SECONDARY:
 
-.PHONY: root-default run run-release
+.PHONY: root-default run~% revision
