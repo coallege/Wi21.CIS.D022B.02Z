@@ -24,10 +24,25 @@ private:
 	string abbreviation{"---"};
 	string uldid{"--------IB"};
 	string aircraft{"unknown"};
-	double weight{};
+	double weight{}; // lbs
 	string destination{"---"};
 public:
 	explicit inline Cargo() noexcept {};
+	explicit Cargo(
+		string type,
+		string abbreviation,
+		string id,
+		string aircraft,
+		double weight,
+		string dest
+	) noexcept:
+		uld{type},
+		abbreviation{abbreviation},
+		uldid{id},
+		aircraft{aircraft},
+		weight{weight},
+		destination{dest}
+	{};
 	inline ~Cargo() noexcept { cout << "Cargo destructor called\n"; };
 
 	inline string get_uld()          const noexcept { return uld; }
@@ -44,6 +59,7 @@ public:
 	inline void set_aircraft(string) noexcept;
 	inline void set_weight(double) noexcept;
 	inline void set_weight(string);
+	inline void set_weight(double, string);
 	inline void set_destination(string);
 
 	friend inline void kilotopound(Cargo *) noexcept;

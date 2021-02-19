@@ -2,11 +2,13 @@
 Cole Gannon
 Winter 2021
 Lab 03
-Problem 3.1
+Problem 3.2
 Description of problem:
 Take user input and store it in a Cargo/Cargo class.
 Use a friend function for unit conversion.
-Then output the class contents.
+Create a copy constructor and demonstrate it's use by copying the newly filled
+Cargo instance into a second Cargo instance.
+Then output the contents of the second Cargo instance.
 */
 #include <string>
 #include <iostream>
@@ -28,7 +30,22 @@ private:
 	string destination{"---"};
 public:
 	explicit inline Cargo() noexcept {};
-		/// copy constructor
+	explicit Cargo(
+		string type,
+		string abbreviation,
+		string id,
+		string aircraft,
+		double weight,
+		string dest
+	) noexcept:
+		uld{type},
+		abbreviation{abbreviation},
+		uldid{id},
+		aircraft{aircraft},
+		weight{weight},
+		destination{dest}
+	{};
+	/// copy constructor
 	inline Cargo(Cargo const &from) noexcept {
 		this->uld          = from.uld;
 		this->abbreviation = from.abbreviation;
