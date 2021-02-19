@@ -82,14 +82,21 @@ inline void input(Cargo *) noexcept;
 inline void output(Cargo const *) noexcept;
 inline string nextline() noexcept;
 int main() {
-	Cargo user_cargo{};
-	output(&user_cargo);
-	input(&user_cargo);
-	output(&user_cargo);
+	Cargo user_cargo_one{};
+	cout << "initial use_cargo_one:\n";
+	output(&user_cargo_one);
+	cout << "\nenter info for use_cargo_one:\n";
+	input(&user_cargo_one);
+	cout << "\nuser_cargo_one:\n";
+	output(&user_cargo_one);
+	cout << "\nuser_cargo_two = user_cargo_one\n";
+	Cargo user_cargo_two = user_cargo_one;
+	cout << "\nuser_cargo_two:\n";
+	output(&user_cargo_two);
+	cout << '\n';
 }
 
 inline void input(Cargo *cargo) noexcept {
-	cout << '\n';
 	cargo->set_from_input("Enter the type/ULD of the cargo (container/pallet)",
 		&Cargo::set_uld);
 	cargo->set_from_input("Enter the abbreviation",
@@ -102,7 +109,6 @@ inline void input(Cargo *cargo) noexcept {
 		&Cargo::set_weight);
 	cargo->set_from_input("Enter an IANA for the cargo destination",
 		&Cargo::set_destination);
-	cout << '\n';
 };
 
 inline void output(Cargo const *cargo) noexcept {

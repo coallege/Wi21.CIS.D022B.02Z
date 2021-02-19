@@ -3,9 +3,14 @@ const path = require("path");
 
 const self = "revision";
 
-if (!fs.existsSync(self)) {
-	fs.mkdirSync(self);
+if (fs.existsSync(self)) {
+	if (fs.statSync(self).isDirectory()) {
+		fs.rmSync(self, {recursive: true, force: true});
+	} else {
+		throw new Error(`non-directory at ${self}`);
+	}
 }
+fs.mkdirSync(self);
 
 const dat = `${self}.dat`;
 if (fs.existsSync(dat)) {
@@ -16,7 +21,7 @@ if (fs.existsSync(dat)) {
 
 rev++;
 
-for (const dirent of fs.readdirSync(process.cwd(), {withFileTypes: true})) {
+for (const dirent of fs.readdirSync(".", {withFileTypes: true})) {
 	if (!dirent.isFile()) {
 		continue;
 	}
