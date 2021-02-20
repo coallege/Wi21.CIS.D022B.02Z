@@ -29,6 +29,12 @@ root-default:
 run~%: %.$(exe)
 	@-./$<
 
+halp/%.exe: halp/%.cpp
+	@$(cxx) $(cxx_flags) $< -o $@
+
+halp~%: halp/%.exe
+	@-./$<
+
 revision:
 	node $(proot)/misc/revision.js
 

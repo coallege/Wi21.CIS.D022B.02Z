@@ -32,7 +32,11 @@ I think this is going to be a fun one.
 
 ## Learnings
 
-Constructor uniform field initialization:
+This is just stuff I figured out or learned by doing assignments in here.
+There's way more actual other cool stuff that I learned during this time but I
+wouldn't really say that this course was the cause of it.
+
+### Constructor uniform field initialization:
 
 ```cpp
 // as seen in @coalpha/coalpha.github.io/cxx/constructor_initializer.cxx
@@ -47,4 +51,25 @@ class HasError {
 public:
    HasError(int c): c{c} {};
 };
+```
+
+### Exceptions (bad)
+
+```cpp
+// etc
+throw {} catch (...) {};
+```
+
+### Member function pointers
+
+```cpp
+template<class Clazz, class ...Ts>
+using method = void (Clazz::*)(Ts ...args);
+```
+
+### cin to string
+
+```cpp
+string hello;
+cin >> hello; // with "hello world"
 ```
