@@ -46,14 +46,14 @@ public:
 		destination{dest}
 	{};
 	/// copy constructor
-	inline Cargo(Cargo const &from) noexcept {
-		this->uld          = from.uld;
-		this->abbreviation = from.abbreviation;
-		this->uldid        = from.uldid;
-		this->aircraft     = from.aircraft;
-		this->weight       = from.weight;
-		this->destination  = from.destination;
-	};
+	inline Cargo(Cargo const &from) noexcept:
+		uld{from.uld},
+		abbreviation{from.abbreviation},
+		uldid{from.uldid},
+		aircraft{from.aircraft},
+		weight{from.weight},
+		destination{from.destination}
+	{};
 	inline ~Cargo() noexcept { cout << "Cargo destructor called\n"; };
 
 	inline string get_uld()          const noexcept { return uld; }
