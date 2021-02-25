@@ -14,7 +14,6 @@ using namespace std;
 
 class Cargo {
 public:
-	static inline string id_alignment(string) noexcept;
 	static inline bool is_container_alignment(string) noexcept;
 	static inline bool is_pallet_alignment(string) noexcept;
 private:

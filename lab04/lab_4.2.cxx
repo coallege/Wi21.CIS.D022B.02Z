@@ -5,17 +5,19 @@ Lab 04
 Problem 4.2
 Description of problem:
 Decouple the input function from the class (already done). Move most of the
-functionality to the input function.
+functionality to the input function. Read input from a file.
 */
 #include <string>
 #include <iostream>
 #include <iomanip>
+#include <fstream>
+#include <sstream>
 
 using namespace std;
 
+/**** Contains Cargo *****/
 class Cargo {
 public:
-	static inline string id_alignment(string) noexcept;
 	static inline bool is_container_alignment(string) noexcept;
 	static inline bool is_pallet_alignment(string) noexcept;
 private:
@@ -27,6 +29,7 @@ private:
 	string destination{"---"};
 public:
 	explicit inline Cargo() noexcept {};
+	/// unused
 	explicit Cargo(
 		string type,
 		string abbreviation,
@@ -42,7 +45,7 @@ public:
 		weight{weight},
 		destination{dest}
 	{};
-	/// copy constructor
+	/// also unused copy constructor
 	inline Cargo(Cargo const &from) noexcept:
 		uld{from.uld},
 		abbreviation{from.abbreviation},
@@ -60,89 +63,74 @@ public:
 	inline double get_weight()       const noexcept { return weight; }
 	inline string get_destination()  const noexcept { return destination; }
 
-	// Setters can be declared out of line since they include input verification
 	inline void set_uld(string);
 	inline void set_abbreviation(string);
 	inline void set_uldid(string);
+	inline void set_full_id(string);
 	inline void set_aircraft(string) noexcept;
 	inline void set_weight(double) noexcept;
 	inline void set_weight(string);
 	inline void set_destination(string);
-
-	using setter = void (Cargo::*)(string);
-	inline void set_from_input(char const *prompt, setter may_throw) noexcept;
-
-	friend inline void kilotopound(Cargo *) noexcept;
-	friend inline bool operator==(Cargo const &, Cargo const &);
 };
 
-inline void input(Cargo *) noexcept;
+inline void input() noexcept;
 inline void output(Cargo const *) noexcept;
-inline string nextline() noexcept;
 int main() {
-	Cargo unit1{};
-	cout << "initial unit1:\n";
-	output(&unit1);
-	cout << "\nenter info for unit1:\n";
-	input(&unit1);
-	cout << "\nunit1:\n";
-	output(&unit1);
-	cout << '\n';
-
-	cout << "unit2 = unit1\n";
-	Cargo unit2 = unit1;
-	cout << "\nunit2:\n";
-	output(&unit2);
-	cout << '\n';
-
-	cout << "unit1 is ";
-	if (!(unit1 == unit2)) cout << "not ";
-	cout << "the same as unit2\n";
-
-	Cargo unit3{};
-	cout << "unit2 is ";
-	if (!(unit2 == unit3)) cout << "not ";
-	cout << "the same as unit3\n";
-	cout << '\n';
+	input();
 }
 
-inline void input(Cargo *cargo) noexcept {
-	cargo->set_from_input("Enter the type/ULD of the cargo (container/pallet)",
-		&Cargo::set_uld);
-	cargo->set_from_input("Enter the abbreviation",
-		&Cargo::set_abbreviation);
-	cargo->set_from_input("Enter a five digit id",
-		&Cargo::set_uldid);
-	cargo->set_from_input("Enter the aircraft that will be carrying the cargo",
-		&Cargo::set_aircraft);
-	cargo->set_from_input("Enter the weight of the cargo",
-		&Cargo::set_weight);
-	cargo->set_from_input("Enter an IANA for the cargo destination",
-		&Cargo::set_destination);
+inline void input() noexcept {
+	ifstream inputFile; // RAII closes this automatically
+	try {
+		inputFile.open("cardata4.txt");
+	} catch (...) {
+		cerr << "Could not open cardata4.txt!\n";
+	}
+
+	string line;
+	while (getline(inputFile, line)) {
+		istringstream oline{line};
+		string type;
+		string abbr;
+		string id;
+		string aircraft;
+		string pounds;
+		string dest;
+
+		oline >> type;
+		oline >> abbr;
+		oline >> id;
+		oline >> aircraft;
+		oline >> pounds;
+		oline >> dest;
+
+		cout << '\n';
+		Cargo temp{};
+		try {
+			temp.set_uld(type);
+			temp.set_abbreviation(abbr);
+			temp.set_full_id(id);
+			temp.set_aircraft(aircraft);
+			temp.set_weight(pounds);
+			temp.set_destination(dest);
+		} catch (string e) {
+			cerr << e << "\n";
+			return;
+		}
+		output(&temp);
+	}
 };
 
 inline void output(Cargo const *cargo) noexcept {
+	cout << fixed;
 	cout << ""
 		"Unit load type: "         << cargo->get_uld() << "\n"
 		"Unit load abbreviation: " << cargo->get_abbreviation() << "\n"
 		"Unit identifier: "        << cargo->get_uldid() << "\n"
 		"Aircraft type: "          << cargo->get_aircraft() << "\n";
-	cout
-		<< fixed
-		<< "Unit weight: " << setprecision(2) << cargo->get_weight() << "\n"
-		<< "Destination code: " << cargo->get_destination() << "\n";
-}
-
-/// Gets the nextline from cin.
-/// If user inputs ctrl+c, exits the entire program.
-inline string nextline() noexcept {
-	string temp;
-	getline(cin, temp);
-	if (!cin.good()) {
-		cout << "Interrupt..." << endl;
-		terminate();
-	}
-	return temp;
+	cout << ""
+		"Unit weight (lbs): " << setprecision(2) << cargo->get_weight() << "\n"
+		"Destination code: "  << cargo->get_destination() << "\n";
 }
 
 inline bool Cargo::is_container_alignment(string str3) noexcept {
@@ -166,8 +154,8 @@ parsed correctly. Some setters may throw `exception` which will be caught and
 handled in Cargo::set_from_input.
 */
 inline void Cargo::set_uld(string uld) {
-	if (uld != "container" && uld != "pallet") {
-		throw string("The ULD must be either \"container\" or \"pallet\"!");
+	if (uld != "Container" && uld != "Pallet") {
+		throw string("The ULD must be either \"Container\" or \"Pallet\"!");
 	}
 
 	this->uld = {uld};
@@ -179,11 +167,11 @@ inline void Cargo::set_abbreviation(string abbr) {
 	}
 
 	if (is_container_alignment(abbr)) {
-		if (this->uld != "container") {
+		if (this->uld != "Container") {
 			throw string("Container abbreviation does not match the current uld!");
 		}
 	} else if (is_pallet_alignment(abbr)) {
-		if (this->uld != "pallet") {
+		if (this->uld != "Pallet") {
 			throw string("Pallet abbreviation does not match the current uld!");
 		}
 	} else {
@@ -211,6 +199,19 @@ inline void Cargo::set_uldid(string uldid) {
 	throw string("The id must be 5 digits!");
 };
 
+inline void Cargo::set_full_id(string full_id) {
+	if (full_id.length() != 10) {
+		throw string("The full id should be 10 characters!");
+	}
+
+	string abbr{full_id.substr(0, 3)};
+	if (abbr != this->abbreviation) {
+		throw string("The first three characters of the id must match the abbreviation!");
+	}
+
+	this->set_uldid(full_id.substr(3, 5));
+};
+
 inline void Cargo::set_aircraft(string aircraft) noexcept {
 	this->aircraft = {aircraft};
 };
@@ -218,10 +219,6 @@ inline void Cargo::set_aircraft(string aircraft) noexcept {
 inline void Cargo::set_weight(double weight) noexcept {
 	this->weight = {weight};
 };
-
-inline void kilotopound(Cargo *self) noexcept {
-	self->weight *= 2.2;
-}
 
 inline void Cargo::set_weight(string weightstr) {
 	double weight;
@@ -232,22 +229,6 @@ inline void Cargo::set_weight(string weightstr) {
 	}
 
 	this->weight = {weight};
-
-	cout << "Is the weight in 'kilos' or 'pounds'?";
-	while (true) {
-		cout << "\n> ";
-		string units{nextline()};
-		if (units == "pounds") {
-			break;
-		}
-
-		if (units == "kilos") {
-			kilotopound(this);
-			break;
-		}
-
-		cout << "The weight must be in either 'kilos' or 'pounds'!";
-	}
 };
 
 inline void Cargo::set_destination(string destination) {
@@ -257,22 +238,3 @@ inline void Cargo::set_destination(string destination) {
 
 	this->destination = {destination};
 };
-
-inline void Cargo::set_from_input(char const *prompt, Cargo::setter setter) noexcept {
-	cout << prompt << ':';
-	while (true) {
-		cout << "\n> ";
-		try {
-			(*this.*setter)(nextline());
-			break;
-		} catch (string e) {
-			cout << e;
-		}
-	}
-}
-
-inline bool operator==(Cargo const &left, Cargo const &right) {
-	return true
-		&& left.abbreviation == right.abbreviation
-		&& left.uldid == right.uldid;
-}
