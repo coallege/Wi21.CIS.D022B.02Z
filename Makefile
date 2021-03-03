@@ -1,5 +1,5 @@
 cxx   := clang++
-proot := $(dir $(lastword $(MAKEFILE_LIST)))
+proot := $(patsubst %/,%,$(dir $(lastword $(MAKEFILE_LIST))))
 
 space_cat = $(shell $(proot)/misc/space_cat.exe $(proot)/$(1))
 
@@ -36,7 +36,7 @@ halp~%: halp/%.exe
 	@-./$<
 
 revision:
-	node $(proot)/misc/revision.js
+	-node $(proot)/misc/revision.js
 
 .SECONDARY:
 

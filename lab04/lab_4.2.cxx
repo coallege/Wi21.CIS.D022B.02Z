@@ -15,13 +15,19 @@ functionality to the input function. Read input from a file.
 
 using namespace std;
 
-/**** Contains Cargo *****/
+/// The Cargo class is an-all-in-one representation of pallets and containers.
+/// Some data is duplicated for whatever reason but this is what-we-have-to-do.
 class Cargo {
 public:
+	/// Since this class actually uses getters and setters correctly for input
+	/// verification, the abbreviation also needs to match with the uld/type.
+	/// Here, we check if a certain string like "AYF" is a container or pallet
+	/// abbreviation.
 	static inline bool is_container_alignment(string) noexcept;
 	static inline bool is_pallet_alignment(string) noexcept;
 private:
 	string uld{"unknown"};
+	/// Duplicated data. Abbreviation is also stored within the uldid...
 	string abbreviation{"---"};
 	string uldid{"--------IB"};
 	string aircraft{"unknown"};
@@ -29,7 +35,7 @@ private:
 	string destination{"---"};
 public:
 	explicit inline Cargo() noexcept {};
-	/// unused
+	/// unused for this program
 	explicit Cargo(
 		string type,
 		string abbreviation,
@@ -73,6 +79,9 @@ public:
 	inline void set_destination(string);
 };
 
+/// no-arg input that should probably just be called main.
+/// we open cardata4.txt and deserialize each line into a Cargo object temp.
+/// temp is then outputted and destroyed.
 inline void input() noexcept;
 inline void output(Cargo const *) noexcept;
 int main() {
@@ -133,6 +142,8 @@ inline void output(Cargo const *cargo) noexcept {
 		"Destination code: "  << cargo->get_destination() << "\n";
 }
 
+/***** Cargo things *****/
+
 inline bool Cargo::is_container_alignment(string str3) noexcept {
 	return 0
 		|| str3 == "AYF"
@@ -150,8 +161,9 @@ inline bool Cargo::is_pallet_alignment(string str3) noexcept {
 
 /* Setters Implementation
 Setters that take `string` will perform checking to make sure the string can be
-parsed correctly. Some setters may throw `exception` which will be caught and
-handled in Cargo::set_from_input.
+parsed correctly. If not, they'll throw a `string`. I know, exceptions are
+bloody slow but what can you do? I don't have another choice if I want control
+flow like this.
 */
 inline void Cargo::set_uld(string uld) {
 	if (uld != "Container" && uld != "Pallet") {
@@ -181,6 +193,7 @@ inline void Cargo::set_abbreviation(string abbr) {
 	this->abbreviation = {abbr};
 }
 
+/// checks if a string is only digits
 inline bool all_digits(string s) noexcept {
 	for (auto &&c : s) {
 		if (!isdigit(c)) {

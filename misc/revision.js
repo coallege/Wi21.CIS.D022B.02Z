@@ -1,5 +1,6 @@
 const fs = require("fs");
 const path = require("path");
+const {execSync} = require("child_process");
 
 const self = "revision";
 
@@ -30,12 +31,19 @@ for (const dirent of fs.readdirSync(".", {withFileTypes: true})) {
 		continue;
 	}
 
-	const basename = path.parse(dirent.name).name;
+	const base_in = path.parse(dirent.name).name;
+	const base_out = `${self}/gannon_cole_${base_in}_r${rev}`;
+	const cpp = `${base_out}.cpp`;
 
-	fs.copyFileSync(
-		dirent.name,
-		`${self}/gannon_cole_${basename}_r${rev}.cpp`,
-	);
+	fs.copyFileSync(dirent.name, cpp);
+
+	if (process.platform === "win32") {
+		const exe = `${base_out}.exe`;
+		console.log(`CXX ${cpp}`);
+		execSync(`wsl clang++ ${cpp} -Wall -Wextra -o ${exe}`, {stdio: "inherit"});
+		console.log(`RM  ${cpp}`);
+		fs.unlinkSync(exe);
+	}
 }
 
 fs.writeFileSync(dat, rev.toString());
