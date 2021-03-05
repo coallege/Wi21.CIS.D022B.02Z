@@ -89,7 +89,8 @@ int main() {
 }
 
 inline void input() noexcept {
-	ifstream inputFile; // RAII closes this automatically
+	// RAII closes this automatically
+	ifstream inputFile;
 	try {
 		inputFile.open("cardata4.txt");
 	} catch (...) {
@@ -141,8 +142,6 @@ inline void output(Cargo const *cargo) noexcept {
 		"Unit weight (lbs): " << setprecision(2) << cargo->get_weight() << "\n"
 		"Destination code: "  << cargo->get_destination() << "\n";
 }
-
-/***** Cargo things *****/
 
 inline bool Cargo::is_container_alignment(string str3) noexcept {
 	return 0
