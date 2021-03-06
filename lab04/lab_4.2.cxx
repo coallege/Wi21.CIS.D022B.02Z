@@ -29,7 +29,7 @@ private:
 	string uld{"unknown"};
 	/// Duplicated data. Abbreviation is also stored within the uldid...
 	string abbreviation{"---"};
-	string uldid{"--------IB"};
+	string uldid{"----------"};
 	string aircraft{"unknown"};
 	double weight{};
 	string destination{"---"};
@@ -72,7 +72,6 @@ public:
 	inline void set_uld(string);
 	inline void set_abbreviation(string);
 	inline void set_uldid(string);
-	inline void set_full_id(string);
 	inline void set_aircraft(string) noexcept;
 	inline void set_weight(double) noexcept;
 	inline void set_weight(string);
@@ -119,7 +118,7 @@ inline void input() noexcept {
 		try {
 			temp.set_uld(type);
 			temp.set_abbreviation(abbr);
-			temp.set_full_id(id);
+			temp.set_uldid(id);
 			temp.set_aircraft(aircraft);
 			temp.set_weight(pounds);
 			temp.set_destination(dest);
@@ -192,36 +191,12 @@ inline void Cargo::set_abbreviation(string abbr) {
 	this->abbreviation = {abbr};
 }
 
-/// checks if a string is only digits
-inline bool all_digits(string s) noexcept {
-	for (auto &&c : s) {
-		if (!isdigit(c)) {
-			return false;
-		}
-	}
-	return true;
-}
-
 inline void Cargo::set_uldid(string uldid) {
-	if (uldid.length() == 5 && all_digits(uldid)) {
-		this->uldid = {this->abbreviation + uldid + "IB"};
-		return;
+	if (uldid.length() != 10) {
+		throw string("The id must be 10 characters!");
 	}
 
-	throw string("The id must be 5 digits!");
-};
-
-inline void Cargo::set_full_id(string full_id) {
-	if (full_id.length() != 10) {
-		throw string("The full id should be 10 characters!");
-	}
-
-	string abbr{full_id.substr(0, 3)};
-	if (abbr != this->abbreviation) {
-		throw string("The first three characters of the id must match the abbreviation!");
-	}
-
-	this->set_uldid(full_id.substr(3, 5));
+	this->uldid = {uldid};
 };
 
 inline void Cargo::set_aircraft(string aircraft) noexcept {

@@ -4,14 +4,13 @@
 
 <img src="misc/icon0_500px.png" width="300px"/>
 
-Lab|Opens|Closes
+What|Opens|Closes
 -|-|-
 [lab01](lab01)|`01/05`|`01/15`
 [lab02](lab02)|`01/03`|`02/05`
 [lab03](lab03)|`02/06`|`02/19`
 [lab04](lab04)|`02/06`|`03/05`
 [lab05](lab05)|`02/06`|`03/19`
-[lab06](lab06)|`0?/??`|`0?/??`
 
 ## Reasons why you shouldn't steal my code:
 
