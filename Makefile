@@ -29,6 +29,9 @@ root-default:
 run~%: %.$(exe)
 	@-./$<
 
+debug~%: %.debug.$(exe)
+	@
+
 halp/%.exe: halp/%.cpp
 	@$(cxx) $(cxx_flags) $< -o $@
 

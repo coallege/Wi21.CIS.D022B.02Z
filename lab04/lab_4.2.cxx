@@ -26,7 +26,7 @@ public:
 	static inline bool is_container_alignment(string) noexcept;
 	static inline bool is_pallet_alignment(string) noexcept;
 private:
-	string uld{"unknown"};
+	string type{"unknown"};
 	/// Duplicated data. Abbreviation is also stored within the uldid...
 	string abbreviation{"---"};
 	string uldid{"----------"};
@@ -44,7 +44,7 @@ public:
 		double weight,
 		string dest
 	) noexcept:
-		uld{type},
+		type{type},
 		abbreviation{abbreviation},
 		uldid{id},
 		aircraft{aircraft},
@@ -53,7 +53,7 @@ public:
 	{};
 	/// also unused copy constructor
 	inline Cargo(Cargo const &from) noexcept:
-		uld{from.uld},
+		type{from.type},
 		abbreviation{from.abbreviation},
 		uldid{from.uldid},
 		aircraft{from.aircraft},
@@ -62,7 +62,7 @@ public:
 	{};
 	inline ~Cargo() noexcept { cout << "Cargo destructor called\n"; };
 
-	inline string get_uld()          const noexcept { return uld; }
+	inline string get_uld()          const noexcept { return type; }
 	inline string get_abbreviation() const noexcept { return abbreviation; }
 	inline string get_uldid()        const noexcept { return uldid; }
 	inline string get_aircraft()     const noexcept { return aircraft; }
@@ -168,7 +168,7 @@ inline void Cargo::set_uld(string uld) {
 		throw string("The ULD must be either \"Container\" or \"Pallet\"!");
 	}
 
-	this->uld = {uld};
+	this->type = {uld};
 }
 
 inline void Cargo::set_abbreviation(string abbr) {
@@ -177,11 +177,11 @@ inline void Cargo::set_abbreviation(string abbr) {
 	}
 
 	if (is_container_alignment(abbr)) {
-		if (this->uld != "Container") {
+		if (this->type != "Container") {
 			throw string("Container abbreviation does not match the current uld!");
 		}
 	} else if (is_pallet_alignment(abbr)) {
-		if (this->uld != "Pallet") {
+		if (this->type != "Pallet") {
 			throw string("Pallet abbreviation does not match the current uld!");
 		}
 	} else {
