@@ -5,7 +5,6 @@ Lab 05
 Problem 5.1
 Description of problem: Suffer
 */
-#include <stdexcept>
 #include <string>
 #include <iostream>
 #include <fstream>
@@ -14,103 +13,262 @@ Description of problem: Suffer
 
 using namespace std;
 
-template<class Child>
 class Cargo {
 protected:
 	string type;
+	string abbr;
 	string id;
 	double lbs;
 	string dest;
 public:
-	explicit inline Cargo() noexcept:
+	Cargo() noexcept:
 		type{"unknown"},
 		id{"----------"},
 		lbs{},
 		dest{"---"}
-	{};
+	{}
 
-	inline Cargo(
+	Cargo(
 		string const type,
+		string const abbr,
 		string const id,
 		double const lbs,
 		string const dest
 	):
 		type{type},
+		abbr{abbr},
 		id{id},
 		lbs{lbs},
 		dest{dest}
 	{
-		if (dest.length() != 3) {
-			throw string("The destination must be a three character IANA");
-		};
-
-		if (Child::lbs_left < lbs) {
-			throw string("The weight of this cargo exceeds the remaining capacity");
+		if (type != "Container" && type != "Pallet") {
+			throw string("The type must be either \"Container\" or \"Pallet\"");
 		}
 
-		Child::lbs_left -= lbs;
-	};
+		if (abbr != id.substr(0, 3)) {
+			throw string("The abbreviation must equal first three characters of the id");
+		}
 
-	inline Cargo(Cargo const &from) noexcept:
+		if (id.length() != 10) {
+			throw string("The id must be ten characters long");
+		}
+
+		if (dest.length() != 3) {
+			throw string("The destination must be a three character IANA");
+		}
+	}
+
+	Cargo(Cargo const &from) noexcept:
 		type{from.type},
+		abbr{from.abbr},
 		id{from.id},
 		lbs{from.lbs},
 		dest{from.dest}
-	{
-		cout << "eeee\n";
-		Child::lbs_left -= lbs;
-	};
+	{}
 
-	inline ~Cargo() noexcept {
-		Child::lbs_left += lbs;
-		cout << "Cargo destructor called\n" << flush;
-	};
+	~Cargo() noexcept { cout << "Cargo destructor called\n"; }
 
-	inline void output() const noexcept {
+public:
+	// unused getters and setters
+	string get_type() const noexcept { return this->type; }
+	string get_abbr() const noexcept { return this->abbr; }
+	string get_id  () const noexcept { return this->id  ; }
+	double get_lbs () const noexcept { return this->lbs ; }
+	string get_dest() const noexcept { return this->dest; }
+
+	void output() const noexcept {
 		cout <<
-			Child::name << " {\n"
-			"   type: " << this->type << ",\n"
-			"   abbr: " << this->id.substr(0, 3) << ",\n"
-			"   id  : " << this->id << ",\n"
-			"   lbs : " << this->lbs << ",\n"
-			"   dest: " << this->dest << ",\n"
-			"}\n"
-		;
+			this->name() << " {\n"
+			"   type = " << this->type << ",\n"
+			"   abbr = " << this->abbr << ",\n"
+			"   id   = " << this->id   << ",\n"
+			"   lbs  = " << this->lbs  << ",\n"
+			"   dest = " << this->dest << ",\n"
+			"}\n";
+	}
+
+	virtual double maxweight() const noexcept = 0;
+	virtual string name() const noexcept = 0;
+};
+
+struct Boeing737Cargo final: public Cargo {
+	using Cargo::Cargo;
+
+	bool abbr_is_container() const noexcept {
+		return false
+			|| this->abbr == "AYF"
+			|| this->abbr == "AYK"
+			|| this->abbr == "AAA"
+			|| this->abbr == "AYY";
+	}
+
+	bool abbr_is_pallet() const noexcept {
+		return false
+			|| this->abbr == "PAG"
+			|| this->abbr == "PMC"
+			|| this->abbr == "PLA";
+	}
+
+	// I wouldn't have to define this if we could use virtual functions within
+	// the parent constructor but because of how classes are instantiated, we
+	// cannot. Quite annoying. Means that I've written basically identical code
+	// for both this class and it's sibling class.
+	Boeing737Cargo(
+		string const type,
+		string const abbr,
+		string const id,
+		double const lbs,
+		string const dest
+	): Cargo(type, abbr, id, lbs, dest)
+	{
+		if (type == "Container") {
+			if (abbr_is_container()) {
+				return;
+			}
+
+			throw (
+				abbr +
+				" is not a valid abbreviation for "
+				"Containers on Boeing737 planes"
+			);
+		} else {
+			if (abbr_is_pallet()) {
+				return;
+			}
+
+			throw (
+				abbr +
+				" is not a valid abbreviation for "
+				"Pallets on Boeing737 planes"
+			);
+		}
+	}
+
+	virtual double maxweight() const noexcept override final {
+		return 46000;
+	}
+
+	virtual string name() const noexcept override final {
+		return {"Boeing737Cargo"};
 	}
 };
 
-struct Boeing737Cargo final: public Cargo<Boeing737Cargo> {
-	static constexpr char const *name{"Boeing737Cargo"};
-	static double lbs_left;
-	using Cargo<Boeing737Cargo>::Cargo;
-};
-double Boeing737Cargo::lbs_left{46000};
+struct Boeing767Cargo final: public Cargo {
+	using Cargo::Cargo;
 
-struct Boeing767Cargo final: public Cargo<Boeing767Cargo> {
-	static constexpr char const *name{"Boeing767Cargo"};
-	static double lbs_left;
-	using Cargo<Boeing767Cargo>::Cargo;
+	bool abbr_is_container() const noexcept {
+		return false
+			|| this->abbr == "AKE"
+			|| this->abbr == "APE"
+			|| this->abbr == "AKC"
+			|| this->abbr == "AQP"
+			|| this->abbr == "AQF"
+			|| this->abbr == "AAP";
+	}
+
+	bool abbr_is_pallet() const noexcept {
+		return false
+			|| this->abbr == "P1P"
+			|| this->abbr == "P6P";
+	}
+
+	Boeing767Cargo(
+		string const type,
+		string const abbr,
+		string const id,
+		double const lbs,
+		string const dest
+	): Cargo(type, abbr, id, lbs, dest)
+	{
+		if (type == "Container") {
+			if (abbr_is_container()) {
+				return;
+			}
+
+			throw (
+				abbr +
+				" is not a valid abbreviation for "
+				"Containers on Boeing767 planes"
+			);
+		} else {
+			if (abbr_is_pallet()) {
+				return;
+			}
+
+			throw (
+				abbr +
+				" is not a valid abbreviation for "
+				"Pallets on Boeing767 planes"
+			);
+		}
+	}
+
+	virtual double maxweight() const noexcept override final {
+		return 116000;
+	}
+
+	virtual string name() const noexcept override final {
+		return {"Boeing767Cargo"};
+	}
 };
-double Boeing767Cargo::lbs_left{116000};
 
 vector<Boeing737Cargo> cargo737{};
-template <class ...Ts>
-inline void load737(Ts ...args) noexcept {
+inline void load737(
+	string const &type,
+	string const &abbr,
+	string const &id,
+	double const lbs,
+	string const &dest
+) noexcept {
+	static double lbs_left{
+		(reinterpret_cast<Boeing737Cargo *>(NULL)->Boeing737Cargo::maxweight)()
+	};
+
+	if (lbs_left < lbs) {
+		cerr
+			<< "Failed to load Cargo with weight of " << lbs
+			<< "lbs onto Boeing737\n";
+		return;
+	}
+
 	try {
-		cargo737.emplace_back(forward<Ts>(args)...);
+		cargo737.emplace_back(type, abbr, id, lbs, dest);
 	} catch (string err) {
 		cerr << err << "!\n";
+		return;
 	}
+
+	lbs_left -= lbs;
+	cout << lbs_left << "lbs left on the Boeing737\n";
 };
 
 vector<Boeing767Cargo> cargo767{};
-template <class ...Ts>
-inline void load767(Ts ...args) noexcept {
+inline void load767(
+	string const &type,
+	string const &abbr,
+	string const &id,
+	double const lbs,
+	string const &dest
+) noexcept {
+	static double lbs_left{
+		(reinterpret_cast<Boeing767Cargo *>(NULL)->Boeing767Cargo::maxweight)()
+	};
+
+	if (lbs_left < lbs) {
+		cerr
+			<< "Failed to load Cargo with weight of " << lbs
+			<< "lbs onto Boeing767\nOnly " << lbs_left << "lbs remaining space\n";
+		return;
+	}
+
 	try {
-		cargo767.emplace_back(forward<Ts>(args)...);
+		cargo767.emplace_back(type, abbr, id, lbs, dest);
 	} catch (string err) {
 		cerr << err << "!\n";
 	}
+
+	lbs_left -= lbs;
+	cout << lbs_left << "lbs left on the Boeing767\n";
 };
 
 #define data_file "lab5data.txt"
@@ -133,26 +291,23 @@ inline void input() noexcept {
 	while (getline(input_file, s_line)) {
 		istringstream line{s_line};
 
-		string type;
-		string abbr;
-		string id;
-		string aircraft;
-		string s_lbs;
-		string dest;
+		string
+			type,
+			abbr,
+			id,
+			aircraft,
+			s_lbs,
+			dest;
 
-		line >> type;
-		line >> abbr;
-		line >> id;
-		line >> aircraft;
-		line >> s_lbs;
-		line >> dest;
+		line
+			>> type
+			>> abbr
+			>> id
+			>> aircraft
+			>> s_lbs
+			>> dest;
 
 		cout << "ENTRY " << ++i << ": " << id << '\n';
-
-		if (abbr != id.substr(0, 3)) {
-			cerr << "The abbreviation must match the first three characters of the id!\n";
-			continue;
-		}
 
 		double lbs;
 		try {
@@ -163,12 +318,12 @@ inline void input() noexcept {
 		}
 
 		if (aircraft == "737") {
-			load737(type, id, lbs, dest);
+			load737(type, abbr, id,lbs, dest);
 			continue;
 		}
 
 		if (aircraft == "767") {
-			load767(type, id, lbs, dest);
+			load767(type, abbr, id, lbs, dest);
 			continue;
 		}
 
@@ -189,7 +344,6 @@ inline void output() noexcept {
 int main() noexcept {
 	cout << "-----------------------\n";
 	input();
-	cout << "-----------------------\n";
 	cout << "-----------------------\n";
 	output();
 	cout << "-----------------------\n";
