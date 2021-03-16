@@ -3,7 +3,11 @@ Cole Gannon
 Winter 2021
 Lab 05
 Problem 5.1
-Description of problem: Suffer
+Description of problem:
+Make Cargo an abstract class using a pure virtual function named `maxweight'
+Create two child classes Boeing737Cargo and Boeing767Cargo.
+Perform input checking when reading in these Cargos from a file into a vector.
+Output the vector contents when finished.
 */
 #include <string>
 #include <iostream>
@@ -65,8 +69,6 @@ public:
 		lbs{from.lbs},
 		dest{from.dest}
 	{}
-
-	~Cargo() noexcept { cout << "Cargo destructor called\n"; }
 
 public:
 	// unused getters and setters
@@ -144,6 +146,8 @@ struct Boeing737Cargo final: public Cargo {
 		}
 	}
 
+	~Boeing737Cargo() noexcept { cout << this->id << " has been deleted\n"; }
+
 	virtual double maxweight() const noexcept override final {
 		return 46000;
 	}
@@ -186,9 +190,7 @@ struct Boeing767Cargo final: public Cargo {
 			}
 
 			throw (
-				abbr +
-				" is not a valid abbreviation for "
-				"Containers on Boeing767 planes"
+				abbr + " is not a valid abbreviation for Containers on Boeing767 planes"
 			);
 		} else {
 			if (abbr_is_pallet()) {
@@ -196,12 +198,12 @@ struct Boeing767Cargo final: public Cargo {
 			}
 
 			throw (
-				abbr +
-				" is not a valid abbreviation for "
-				"Pallets on Boeing767 planes"
+				abbr + " is not a valid abbreviation for Pallets on Boeing767 planes"
 			);
 		}
 	}
+
+	~Boeing767Cargo() noexcept { cout << this->id << " has been deleted\n"; }
 
 	virtual double maxweight() const noexcept override final {
 		return 116000;
@@ -219,7 +221,7 @@ inline void load737(
 	string const &id,
 	double const lbs,
 	string const &dest
-) noexcept {
+) {
 	static double lbs_left{
 		(reinterpret_cast<Boeing737Cargo *>(NULL)->Boeing737Cargo::maxweight)()
 	};
@@ -231,15 +233,9 @@ inline void load737(
 		return;
 	}
 
-	try {
-		cargo737.emplace_back(type, abbr, id, lbs, dest);
-	} catch (string err) {
-		cerr << err << "!\n";
-		return;
-	}
+	cargo737.emplace_back(type, abbr, id, lbs, dest);
 
 	lbs_left -= lbs;
-	cout << lbs_left << "lbs left on the Boeing737\n";
 };
 
 vector<Boeing767Cargo> cargo767{};
@@ -249,7 +245,7 @@ inline void load767(
 	string const &id,
 	double const lbs,
 	string const &dest
-) noexcept {
+) {
 	static double lbs_left{
 		(reinterpret_cast<Boeing767Cargo *>(NULL)->Boeing767Cargo::maxweight)()
 	};
@@ -261,14 +257,9 @@ inline void load767(
 		return;
 	}
 
-	try {
-		cargo767.emplace_back(type, abbr, id, lbs, dest);
-	} catch (string err) {
-		cerr << err << "!\n";
-	}
+	cargo767.emplace_back(type, abbr, id, lbs, dest);
 
 	lbs_left -= lbs;
-	cout << lbs_left << "lbs left on the Boeing767\n";
 };
 
 #define data_file "lab5data.txt"
@@ -299,6 +290,8 @@ inline void input() noexcept {
 			s_lbs,
 			dest;
 
+		line.clear();
+
 		line
 			>> type
 			>> abbr
@@ -306,6 +299,10 @@ inline void input() noexcept {
 			>> aircraft
 			>> s_lbs
 			>> dest;
+
+		if (line.fail()) {
+			cout << "BAD ENTRY\n";
+		}
 
 		cout << "ENTRY " << ++i << ": " << id << '\n';
 
@@ -317,17 +314,19 @@ inline void input() noexcept {
 			continue;
 		}
 
-		if (aircraft == "737") {
-			load737(type, abbr, id,lbs, dest);
-			continue;
-		}
+		try {
+			if (aircraft == "737") {
+				load737(type, abbr, id, lbs, dest);
+			} else if (aircraft == "767") {
+				load767(type, abbr, id, lbs, dest);
+			} else {
+				throw aircraft + " is not a valid aircraft";
+			}
 
-		if (aircraft == "767") {
-			load767(type, abbr, id, lbs, dest);
-			continue;
+			cout << "ENTRY " << i << ": OK\n";
+		} catch (string err) {
+			cerr << "ENTRY " << i << ": " << err << "!\n";
 		}
-
-		cerr << "Unknown aircraft \"" << aircraft << "\"!\n";
 	}
 };
 
@@ -342,7 +341,6 @@ inline void output() noexcept {
 }
 
 int main() noexcept {
-	cout << "-----------------------\n";
 	input();
 	cout << "-----------------------\n";
 	output();

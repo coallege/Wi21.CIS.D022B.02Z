@@ -1,3 +1,15 @@
 Pallet     PAG    PAG45982IB   737    4978   OAK
+Pallet     P1P    P1P23490QQ   767    9934   LAX
+Pallet     P6P    P6P58682NZ   767    9934   SFO
 Container  AYF    AYF23409AA   737    2209   LAS
 Container  AAA    AAA89023DL   737    5932   DFW
+Container  AKC    AKC39500GL   767    1000   NZL
+Pallet     PAG    PAG45982IB   767    0000   INV
+Pallet     P1P    P1P23490QQ   767    0000   INVALID
+Pallet     P6P    BAD58682NZ   737    0000   INV
+Pallet     AYF    AYF58682NZ   737    0000   INV
+Pallet     AYF    AYF44235NZ   767    0000   INV
+Container  AYF    AYF234BAD    737    0000   INV
+Container  BAD    BAD99483IB   737    0000   INV
+Container  AYF    AYF11130NZ   767    0000   INV
+Container  APE    AKE99999QN   737    0000   INV
