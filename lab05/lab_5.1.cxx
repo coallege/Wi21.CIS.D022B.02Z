@@ -14,6 +14,7 @@ Output the vector contents when finished.
 #include <fstream>
 #include <sstream>
 #include <vector>
+#include <iomanip>
 
 using namespace std;
 
@@ -27,6 +28,7 @@ protected:
 public:
 	Cargo() noexcept:
 		type{"unknown"},
+		abbr{"---"},
 		id{"----------"},
 		lbs{},
 		dest{"---"}
@@ -215,6 +217,7 @@ struct Boeing767Cargo final: public Cargo {
 };
 
 vector<Boeing737Cargo> cargo737{};
+double lbs_737{};
 inline void load737(
 	string const &type,
 	string const &abbr,
@@ -222,9 +225,8 @@ inline void load737(
 	double const lbs,
 	string const &dest
 ) {
-	static double lbs_left{
-		(reinterpret_cast<Boeing737Cargo *>(NULL)->Boeing737Cargo::maxweight)()
-	};
+	static auto any737{reinterpret_cast<Boeing737Cargo *>(737)};
+	static double lbs_left{any737->maxweight()};
 
 	if (lbs_left < lbs) {
 		cerr
@@ -236,9 +238,11 @@ inline void load737(
 	cargo737.emplace_back(type, abbr, id, lbs, dest);
 
 	lbs_left -= lbs;
+	lbs_737  += lbs;
 };
 
 vector<Boeing767Cargo> cargo767{};
+double lbs_767{};
 inline void load767(
 	string const &type,
 	string const &abbr,
@@ -246,9 +250,8 @@ inline void load767(
 	double const lbs,
 	string const &dest
 ) {
-	static double lbs_left{
-		(reinterpret_cast<Boeing767Cargo *>(NULL)->Boeing767Cargo::maxweight)()
-	};
+	static auto any767{reinterpret_cast<Boeing767Cargo *>(767)};
+	static double lbs_left{any767->maxweight()};
 
 	if (lbs_left < lbs) {
 		cerr
@@ -260,16 +263,17 @@ inline void load767(
 	cargo767.emplace_back(type, abbr, id, lbs, dest);
 
 	lbs_left -= lbs;
+	lbs_767  += lbs;
 };
 
-#define data_file "lab5data.txt"
+#define filename "lab5data.txt"
 
 inline void input() noexcept {
 	ifstream input_file;
-	input_file.open(data_file);
+	input_file.open(filename);
 
 	if (!input_file.is_open()) {
-		cerr << "Could not open " data_file "!\n";
+		cerr << "Could not open " filename "!\n";
 		return;
 	}
 
@@ -302,9 +306,11 @@ inline void input() noexcept {
 
 		if (line.fail()) {
 			cout << "BAD ENTRY\n";
+			continue;
 		}
 
-		cout << "ENTRY " << ++i << ": " << id << '\n';
+		i++;
+		cout << "ENTRY " << setw(2) << i << ": " << id << '\n';
 
 		double lbs;
 		try {
@@ -323,18 +329,34 @@ inline void input() noexcept {
 				throw aircraft + " is not a valid aircraft";
 			}
 
-			cout << "ENTRY " << i << ": OK\n";
+			cout << "ENTRY " << setw(2) << i << ": OK\n";
 		} catch (string err) {
-			cerr << "ENTRY " << i << ": " << err << "!\n";
+			cerr << "ENTRY " << setw(2) << i << ": " << err << "!\n";
 		}
 	}
 };
 
+inline void line() {
+	cout << "-----------------------\n";
+}
+
 inline void output() noexcept {
+	cout <<
+		"Boeing737\n"
+		"ON BOARD  = " << cargo737.size() << "\n"
+		"TOTAL LBS = " << lbs_737 << "\n"
+		"\n";
 	for (auto &b737 : cargo737) {
 		b737.output();
 	}
 
+	line();
+
+	cout <<
+		"Boeing767\n"
+		"ON BOARD  = " << cargo767.size() << "\n"
+		"TOTAL LBS = " << lbs_767 << "\n"
+		"\n";
 	for (auto &b767 : cargo767) {
 		b767.output();
 	}
@@ -342,7 +364,7 @@ inline void output() noexcept {
 
 int main() noexcept {
 	input();
-	cout << "-----------------------\n";
+	line();
 	output();
-	cout << "-----------------------\n";
+	line();
 }
