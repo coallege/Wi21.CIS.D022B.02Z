@@ -226,19 +226,18 @@ inline void load737(
 	string const &dest
 ) {
 	static auto any737{reinterpret_cast<Boeing737Cargo *>(737)};
-	static double lbs_left{any737->maxweight()};
+	static double maxweight{any737->maxweight()};
 
-	if (lbs_left < lbs) {
-		cerr
-			<< "Failed to load Cargo with weight of " << lbs
-			<< "lbs onto Boeing737\n";
-		return;
+	if (lbs_737 + lbs > maxweight) {
+		ostringstream err;
+		err
+			<< "Loading Cargo with weight " << lbs
+			<< "lbs exceeds 737 max weight of " << maxweight;
+		throw err.str();
 	}
 
 	cargo737.emplace_back(type, abbr, id, lbs, dest);
-
-	lbs_left -= lbs;
-	lbs_737  += lbs;
+	lbs_737 += lbs;
 };
 
 vector<Boeing767Cargo> cargo767{};
@@ -251,19 +250,18 @@ inline void load767(
 	string const &dest
 ) {
 	static auto any767{reinterpret_cast<Boeing767Cargo *>(767)};
-	static double lbs_left{any767->maxweight()};
+	static double maxweight{any767->maxweight()};
 
-	if (lbs_left < lbs) {
-		cerr
-			<< "Failed to load Cargo with weight of " << lbs
-			<< "lbs onto Boeing767\nOnly " << lbs_left << "lbs remaining space\n";
-		return;
+	if (lbs_767 + lbs > maxweight) {
+		ostringstream err;
+		err
+			<< "Loading Cargo with weight " << lbs
+			<< "lbs exceeds 767 max weight of " << maxweight;
+		throw err.str();
 	}
 
 	cargo767.emplace_back(type, abbr, id, lbs, dest);
-
-	lbs_left -= lbs;
-	lbs_767  += lbs;
+	lbs_767 += lbs;
 };
 
 #define filename "lab5data.txt"
@@ -364,7 +362,12 @@ inline void output() noexcept {
 
 int main() noexcept {
 	input();
-	line();
-	output();
-	line();
 }
+
+struct finally {
+	~finally() noexcept {
+		line();
+		output();
+		line();
+	}
+} finally;
