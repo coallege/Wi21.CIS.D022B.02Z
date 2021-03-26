@@ -8,10 +8,10 @@ cxx_dflags ?= -g
 cxx_rflags ?= -O2
 
 ifeq ($(OS), Windows_NT)
-	exe=exe
+	exe = exe
 	cxx_flags += -fuse-ld=lld-link
 else
-	exe=elf
+	exe = elf
 endif
 
 root-default:
@@ -32,11 +32,11 @@ run~%: %.$(exe)
 debug~%: %.debug.$(exe)
 	@
 
-halp/%.exe: halp/%.cpp
+halp/%.$(exe): %.cpp
 	@$(cxx) $(cxx_flags) $< -o $@
 
-halp~%: halp/%.exe
-	@-./$<
+halp~%: halp/%.$(exe)
+	@-cd halp && ./$<
 
 revision:
 	-node $(proot)/misc/revision.js
